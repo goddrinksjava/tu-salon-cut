@@ -1,0 +1,33 @@
+{
+  "name": "shared",
+  "type": "module",
+  "main": "dist/index.js",
+  "private": true,
+  "version": "0.1.0",
+  "description": "",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "exports": {
+    ".": "./dist"
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./dist/*"
+      ]
+    }
+  },
+  "dependencies": {
+    "yup": "^0.32.11"
+  },
+  "devDependencies": {
+    "typescript": "^4.6.2"
+  }
+}

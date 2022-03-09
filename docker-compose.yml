@@ -1,0 +1,42 @@
+version: '3'
+services:
+  db:
+    build:
+      context: ./
+      dockerfile: ./docker/db/Dockerfile
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=user_tu_salon_cut
+      - POSTGRES_DB=tu_salon_cut
+      - PGDATA=/data/db
+    volumes:
+      - db:/data/db
+    expose:
+      - 5432
+    ports:
+      - '5432:5432'
+
+  api:
+    build:
+      context: ./
+      dockerfile: ./docker/api/Dockerfile
+    restart: always
+    environment:
+      - PGUSER=user_tu_salon_cut
+      - PGHOST=localhost
+      - PGPASSWORD=postgres
+      - PGDATABASE=tu_salon_cut
+      - PGPORT=5432
+      - JWT_SECRET=secret
+    volumes:
+      - ./:/home/node/app
+    ports:
+      - '3000:3000' #Next
+      - '4000:4000' #Express
+    depends_on:
+      - db
+
+volumes:
+  db:
+    driver: local

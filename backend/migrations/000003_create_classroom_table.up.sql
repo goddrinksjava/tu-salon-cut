@@ -1,0 +1,1 @@
+create table classroom(id varchar(20) primary key);
