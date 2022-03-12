@@ -2,7 +2,7 @@
     "compilerOptions": {
         "module": "commonjs",
         "target": "esnext",
-        "moduleResolution": "node",
+        "moduleResolution": "Node",
         "sourceMap": true,
         "outDir": "dist",
         "allowJs": true,
@@ -10,10 +10,18 @@
             "dom",
             "es6"
         ],
-        "baseUrl": "./src",
-        "rootDir": "./src",
-        "esModuleInterop": true
+        "rootDir": ".",
+        "esModuleInterop": true,
+        "paths": {
+            "@shared/*": [
+                "../shared/src/*"
+            ]
+        }
     },
+    "typeRoots": [
+        "./nodemodules/@types",
+        "./src/types"
+    ],
     "exclude": [
         "node_modules",
         "dist"
@@ -24,5 +32,10 @@
     ],
     "files": [
         "src/index.ts"
+    ],
+    "references": [
+        {
+            "path": "../shared"
+        }
     ]
 }

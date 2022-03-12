@@ -1,32 +1,28 @@
-import { signJwt } from 'auth/signJwt';
+import { signJwt } from '../auth/signJwt';
 import * as express from 'express';
 import { NextFunction, Request, Response, Router } from 'express';
 import argon2 from 'argon2';
-import { createUser, getUserByEmail } from 'services/userService';
-import Credentials from 'shared/dto/credentials';
+import { createUser, getUserByEmail } from '../services/userService';
+import Credentials from '@shared/dto/credentials';
 
 const authRouter: Router = express.Router();
 
-type AuthRequest = Request & Credentials;
-
 authRouter.post(
   '/login',
-  async (req: AuthRequest, res: Response, next: NextFunction) => {
-    const authError = new Error('Failed to authenticate');
-
+  async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const user = await getUserByEmail(req.email);
+      const user = await getUserByEmail(req.body.email);
 
       if (!user) {
-        next(authError);
+        return res.sendStatus(403);
       }
 
-      if (await argon2.verify(user.hashed_password, req.password)) {
+      if (await argon2.verify(user.hashed_password, req.body.password)) {
         res.cookie('access_token', `Bearer ${signJwt(user)}`, {
           httpOnly: true,
         });
       } else {
-        next(authError);
+        return res.sendStatus(403);
       }
     } catch (err) {
       next(err);
@@ -36,21 +32,26 @@ authRouter.post(
 
 authRouter.post(
   '/signup',
-  async (req: AuthRequest, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, next: NextFunction) => {
     const authError = new Error('Failed to authenticate');
 
-    if (!req.email || !req.password) {
+    if (!req.body.email || !req.body.password) {
       next(authError);
     }
 
-    const result = await createUser(req.email, req.password, 'user');
-
-    if (result == 'EmailTaken') {
-      next(new Error('Email Taken'));
-    } else {
-      res.cookie('access_token', `Bearer ${signJwt(result)}`, {
-        httpOnly: true,
-      });
+    try {
+      const result = await createUser(
+        req.body.email,
+        req.body.password,
+        'user',
+      );
+      if (result == 'EmailTaken') {
+        next(new Error('Email Taken'));
+      } else {
+        res.json(signJwt(result));
+      }
+    } catch (err) {
+      next(err);
     }
   },
 );

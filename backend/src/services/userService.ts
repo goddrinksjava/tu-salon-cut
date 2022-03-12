@@ -1,22 +1,29 @@
-import pool from 'pool';
-import User from 'types/user';
+import pool from '../pool';
 import argon2 from 'argon2';
+import User from '../types/user';
+import { DatabaseError } from 'pg';
+import db from '../knex';
 
 const createUser = async (
   email: string,
   plain_password: string,
-  fk_app_role: string,
+  role: 'admin' | 'user' = 'user',
 ): Promise<User | 'EmailTaken'> => {
-  const hashed_password = await argon2.hash(plain_password);
+  const hashed_password = await argon2.hash(plain_password, {
+    type: argon2.argon2id,
+  });
 
   try {
-    const { rows } = await pool.query(
-      'INSERT INTO user (email, hashed_password, fk_app_role) VALUES ($1, $2, $3, $4) RETURNING *',
-      [email, hashed_password, fk_app_role],
-    );
-    return rows.at(0) as Promise<User>;
+    const user = await db('users')
+      .insert({
+        email,
+        hashed_password,
+      })
+      .returning('*');
+
+    return user.at(0);
   } catch (err) {
-    if (err.code == '23505') {
+    if (err instanceof DatabaseError && err.code == '23505') {
       return 'EmailTaken';
     }
     throw err;
@@ -24,10 +31,7 @@ const createUser = async (
 };
 
 const getUserByEmail = async (email: string): Promise<User | null> => {
-  const { rows } = await pool.query('SELECT * FROM users WHERE email = $1', [
-    email,
-  ]);
-  return rows.at(0);
+  return db('users').select().where({ email }).first();
 };
 
 export { createUser, getUserByEmail };

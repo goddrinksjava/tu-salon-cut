@@ -16,26 +16,39 @@ services:
       - 5432
     ports:
       - '5432:5432'
+    healthcheck:
+      test: pg_isready -U user_tu_salon_cut -d tu_salon_cut
 
-  api:
+  backend:
     build:
       context: ./
-      dockerfile: ./docker/api/Dockerfile
+      dockerfile: ./docker/backend/Dockerfile
+    command: sh -c "yarn install && yarn start:dev"
     restart: always
     environment:
-      - PGUSER=user_tu_salon_cut
-      - PGHOST=localhost
-      - PGPASSWORD=postgres
-      - PGDATABASE=tu_salon_cut
-      - PGPORT=5432
-      - JWT_SECRET=secret
+      - DB_PASSWORD=postgres
+      - DB_USER=user_tu_salon_cut
+      - DB_DATABASE=tu_salon_cut
+      - DB_HOST=db
+      - DB_CLIENT=postgres
     volumes:
       - ./:/home/node/app
     ports:
-      - '3000:3000' #Next
-      - '4000:4000' #Express
+      - '4000:4000'
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./
+      dockerfile: ./docker/frontend/Dockerfile
+    command: sh -c "yarn install && yarn start:dev"
+    restart: always
+    volumes:
+      - ./:/home/node/app
+    ports:
+      - '3000:3000'
 
 volumes:
   db:

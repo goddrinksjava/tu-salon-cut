@@ -1,7 +1,6 @@
-import jwtConfig from 'config/jwtConfig';
+import jwtConfig from '../config/jwtConfig';
 import { NextFunction, Request, Response, Router } from 'express';
 import jwt from 'jsonwebtoken';
-import { string } from 'yup';
 
 const jwtMiddleware = async (
   req: Request & { user: any },

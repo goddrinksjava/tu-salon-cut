@@ -1,1 +1,0 @@
-create table classroom_problem(id serial primary key, label varchar(20));

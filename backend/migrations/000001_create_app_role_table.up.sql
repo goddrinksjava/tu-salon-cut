@@ -1,1 +1,0 @@
-create table app_role(id varchar(20) primary key)

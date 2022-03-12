@@ -1,17 +1,9 @@
-import express, { Application } from 'express';
-import authRoute from 'routes/auth';
-import profileRouter from 'routes/profile';
-import cookieParser from 'cookie-parser';
-import jwtMiddleware from 'auth/jwtMiddleware';
+import app from './expressApp';
+import db from './knex';
 
-const app: Application = express();
+// db.migrate.latest();
 
 const port = 4000;
-
-app.use(cookieParser());
-
-app.use('/auth', authRoute);
-app.use('/profile', jwtMiddleware, profileRouter);
 
 app.listen(port, function () {
   console.log(`App is listening on port ${port}`);
