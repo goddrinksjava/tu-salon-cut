@@ -10,7 +10,6 @@
             "dom",
             "es6"
         ],
-        "rootDir": ".",
         "esModuleInterop": true,
         "paths": {
             "@shared/*": [
@@ -29,9 +28,6 @@
     "include": [
         "src/**/*.ts",
         "tests/**/*.spec.ts"
-    ],
-    "files": [
-        "src/index.ts"
     ],
     "references": [
         {

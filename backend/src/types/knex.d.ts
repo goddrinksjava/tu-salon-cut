@@ -31,6 +31,14 @@ declare module 'knex/types/tables' {
       Partial<Omit<ClassroomProblem, 'id'>>
     >;
 
-    classroom_complaints: Knex.CompositeTableType<ClassroomComplaint>;
+    classroom_complaints: Knex.CompositeTableType<
+      ClassroomComplaint,
+      Pick<
+        ClassroomComplaint,
+        'fk_user' | 'fk_classroom' | 'fk_classroom_problem'
+      > &
+        Partial<Pick<ClassroomComplaint, 'created_at' | 'updated_at'>>,
+      Partial<Omit<ClassroomComplaint, 'id'>>
+    >;
   }
 }

@@ -16,10 +16,4 @@ const credentialsSchema = yup.object().shape({
     .required('Contraseña requerida'),
 });
 
-const signupSchemaWithConfirmation = credentialsSchema.shape({
-  passwordConfirmation: yup
-    .string()
-    .oneOf([yup.ref('password')], 'Las contraseñas deben coincidir'),
-});
-
 export { credentialsSchema };

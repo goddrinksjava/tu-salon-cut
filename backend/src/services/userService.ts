@@ -1,4 +1,3 @@
-import pool from '../pool';
 import argon2 from 'argon2';
 import User from '../types/user';
 import { DatabaseError } from 'pg';
@@ -7,7 +6,6 @@ import db from '../knex';
 const createUser = async (
   email: string,
   plain_password: string,
-  role: 'admin' | 'user' = 'user',
 ): Promise<User | 'EmailTaken'> => {
   const hashed_password = await argon2.hash(plain_password, {
     type: argon2.argon2id,
