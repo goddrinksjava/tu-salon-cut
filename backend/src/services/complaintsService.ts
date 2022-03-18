@@ -36,19 +36,18 @@ const setComplaints = async (
   });
 };
 
-const getComplaints = async (classroomId: number): Promise<any> => {
-  // Note that in Postgres, count returns a bigint type which will be a String and not a Number
-  const complaints = new Map<string, string>();
-
-  const result = await db('classroom_complaints')
-    .join(
-      'classroom_problems',
-      'classroom_problems.id',
-      'classroom_complaints.fk_classroom_problem',
-    )
-    .count('*')
+const getComplaints = async (
+  classroomId: number,
+): Promise<[{ label: string; count: string }] | any> => {
+  const result = await db('classroom_problems')
+    .leftJoin('classroom_complaints', function () {
+      this.on(
+        'classroom_problems.id',
+        'classroom_complaints.fk_classroom_problem',
+      ).andOnVal('classroom_complaints.fk_classroom', classroomId);
+    })
+    .count('classroom_complaints.fk_classroom_problem')
     .select('classroom_problems.label')
-    .where({ fk_classroom: classroomId })
     .groupBy('classroom_problems.label');
 
   return result;
