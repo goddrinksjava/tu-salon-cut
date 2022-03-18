@@ -11,7 +11,7 @@ import db from '../knex';
 const setComplaints = async (
   userId: number,
   classroomId: number,
-  classroomProblemsId: [number],
+  classroomProblemsId: number[],
 ): Promise<void> => {
   const inserts = classroomProblemsId.map((classroomProblemId) => ({
     fk_user: userId,
@@ -38,7 +38,7 @@ const setComplaints = async (
 
 const getComplaints = async (
   classroomId: number,
-): Promise<[{ label: string; count: string }] | any> => {
+): Promise<{ label: string; count: string }[]> => {
   const result = await db('classroom_problems')
     .leftJoin('classroom_complaints', function () {
       this.on(

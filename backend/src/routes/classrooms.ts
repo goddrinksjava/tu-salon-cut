@@ -29,7 +29,6 @@ classroomsRouter.get(
     try {
       const classroomId = parseInt(classroomIdStr);
       const complaints = await getComplaints(classroomId);
-      console.log(complaints);
       res.json(complaints);
     } catch (err) {
       next(err);
