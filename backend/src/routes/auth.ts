@@ -26,7 +26,8 @@ authRouter.post(
         return res.sendStatus(200);
       }
 
-      return res.sendStatus(403);
+      res.status(403);
+      return res.json({ error: 'Email o contraseña incorrectos' });
     } catch (err) {
       next(err);
     }
@@ -40,17 +41,16 @@ authRouter.post(
     try {
       const result = await createUser(req.body.email, req.body.password);
       if (result == 'EmailTaken') {
-        res
-          .sendStatus(400)
-          .send({ name: 'email', message: 'Este email ya ha sido registrado' });
-      } else {
-        req.session.user = {
-          id: result.id,
-          email: result.email,
-          isAdmin: result.is_admin,
-        };
-        res.sendStatus(200);
+        return res.json({ error: 'Este email ya ha sido registrado' });
       }
+
+      req.session.user = {
+        id: result.id,
+        email: result.email,
+        isAdmin: result.is_admin,
+      };
+
+      res.sendStatus(200);
     } catch (err) {
       next(err);
     }

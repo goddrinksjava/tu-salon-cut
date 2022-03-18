@@ -1,8 +1,9 @@
 import express, { Application, json } from 'express';
-import authRoute from './routes/auth';
+import authRouter from './routes/auth';
 import session from 'express-session';
 import connect from 'connect-redis';
 import redis from './redis';
+import classroomsRouter from './routes/classrooms';
 
 const app: Application = express();
 
@@ -25,6 +26,7 @@ app.use(
 
 app.use(express.json());
 
-app.use('/auth', authRoute);
+app.use('/auth', authRouter);
+app.use('/classrooms', classroomsRouter);
 
 export default app;
