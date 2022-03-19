@@ -1,11 +1,11 @@
 import { NextFunction, Request, Response, Router } from 'express';
 
 const authenticate =
-  ({ adminOnly = false }) =>
+  ({ mustBeAdmin } = { mustBeAdmin: false }) =>
   async (req: Request, res: Response, next: NextFunction) => {
     const user = req.session.user;
 
-    if (user && (!adminOnly || user.isAdmin)) {
+    if (user && (!mustBeAdmin || user.isAdmin)) {
       req.user = user;
       return next();
     }

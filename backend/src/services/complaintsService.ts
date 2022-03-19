@@ -19,27 +19,50 @@ const setComplaints = async (
     fk_classroom_problem: classroomProblemId,
   }));
 
-  db.transaction(async (trx) => {
+  const trx = await db.transaction();
+
+  try {
     await db('classroom_complaints')
       .transacting(trx)
       .del()
       .where({ fk_user: userId, fk_classroom: classroomId })
-      .insert(inserts)
-      .then(trx.commit)
-      .catch(trx.rollback);
+      .insert(inserts);
 
-    await db('classroom_complaints')
-      .transacting(trx)
-      .insert(inserts)
-      .then(trx.commit)
-      .catch(trx.rollback);
+    await db('classroom_complaints').transacting(trx).insert(inserts);
+
+    await trx.commit();
+  } catch (err) {
+    trx.rollback(err);
+  }
+};
+
+interface IGetComplaintsWithCheckedByUserOutput {
+  label: string;
+  count: string;
+  checked: boolean;
+}
+
+const getComplaintsWithCheckedByUser = async (
+  classroomId: number,
+  userId: number,
+): Promise<{ label: string; count: string }[]> => {
+  const promise1 = getComplaints(classroomId);
+  const promise2 = getUserComplaints(classroomId, userId);
+
+  const [complaints, userComplaints] = await Promise.all([promise1, promise2]);
+
+  return complaints.map((complaint) => {
+    const result = complaint as IGetComplaintsWithCheckedByUserOutput;
+    result.checked = userComplaints.includes(result.label);
+    console.log(result);
+    return result;
   });
 };
 
 const getComplaints = async (
   classroomId: number,
 ): Promise<{ label: string; count: string }[]> => {
-  const result = await db('classroom_problems')
+  const result = db('classroom_problems')
     .leftJoin('classroom_complaints', function () {
       this.on(
         'classroom_problems.id',
@@ -53,4 +76,25 @@ const getComplaints = async (
   return result;
 };
 
-export { getComplaints, setComplaints };
+const getUserComplaints = async (
+  classroomId: number,
+  userId: number,
+): Promise<string[]> => {
+  const result = db('classroom_complaints')
+    .join(
+      'classroom_problems',
+      'classroom_problems.id',
+      'classroom_complaints.fk_classroom_problem',
+    )
+    .pluck('classroom_problems.label')
+    .where({ fk_classroom: classroomId, fk_user: userId });
+
+  return result;
+};
+
+export {
+  getComplaints,
+  getUserComplaints,
+  getComplaintsWithCheckedByUser,
+  setComplaints,
+};

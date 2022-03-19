@@ -7,20 +7,17 @@ import classroomsRouter from './routes/classrooms';
 
 const app: Application = express();
 
-app.set('trust proxy', 1);
+// app.set('trust proxy', 1);
 
 let RedisStore = connect(session);
 app.use(
   session({
     store: new RedisStore({ client: redis }),
     // Use an array of secrets to support key rotation as an additional security measure.
-    secret: [
-      process.env.SESSION_SECRET_SIGN_1,
-      process.env.SESSION_SECRET_SIGN_1,
-    ],
+    secret: [process.env.SESSION_SECRET_1, process.env.SESSION_SECRET_2],
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: true },
+    cookie: { secure: false },
   }),
 );
 

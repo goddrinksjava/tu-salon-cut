@@ -1,20 +1,21 @@
 import * as express from 'express';
 import { NextFunction, Request, Response, Router } from 'express';
-import { getComplaints, setComplaints } from '../services/complaintsService';
+import authenticate from '../middleware/authenticateMiddleware';
+import {
+  getComplaintsWithCheckedByUser,
+  setComplaints,
+} from '../services/complaintsService';
 const classroomsRouter: Router = express.Router();
 
 classroomsRouter.post(
   '/:id',
+  authenticate(),
   async (req: Request, res: Response, next: NextFunction) => {
     const classroomIdStr = req.params.id;
 
     try {
       const classroomId = parseInt(classroomIdStr);
-      setComplaints(
-        req.session.user.id,
-        classroomId,
-        req.body.classroomProblemsId,
-      );
+      setComplaints(req.user.id, classroomId, req.body.classroomProblemsId);
     } catch (err) {
       next(err);
     }
@@ -23,12 +24,16 @@ classroomsRouter.post(
 
 classroomsRouter.get(
   '/:id',
+  authenticate(),
   async (req: Request, res: Response, next: NextFunction) => {
     const classroomIdStr = req.params.id;
 
     try {
       const classroomId = parseInt(classroomIdStr);
-      const complaints = await getComplaints(classroomId);
+      const complaints = await getComplaintsWithCheckedByUser(
+        classroomId,
+        req.user.id,
+      );
       res.json(complaints);
     } catch (err) {
       next(err);
