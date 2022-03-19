@@ -40,6 +40,14 @@ authRouter.post(
           email: user.email,
           isAdmin: user.is_admin,
         };
+
+        req.session.save(function (err) {
+          console.error(err);
+          next(err);
+        });
+
+        console.log(req.session);
+
         return res.sendStatus(200);
       }
 
@@ -67,6 +75,13 @@ authRouter.post(
         email: result.email,
         isAdmin: result.is_admin,
       };
+
+      req.session.save(function (err) {
+        console.error(err);
+        next(err);
+      });
+
+      console.log(req.session);
 
       res.sendStatus(200);
     } catch (err) {

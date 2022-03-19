@@ -45,7 +45,7 @@ interface IGetComplaintsWithCheckedByUserOutput {
 const getComplaintsWithCheckedByUser = async (
   classroomId: number,
   userId: number,
-): Promise<{ label: string; count: string }[]> => {
+): Promise<IGetComplaintsWithCheckedByUserOutput[]> => {
   const promise1 = getComplaints(classroomId);
   const promise2 = getUserComplaints(classroomId, userId);
 

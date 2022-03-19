@@ -5,9 +5,9 @@ import {
   getComplaintsWithCheckedByUser,
   setComplaints,
 } from '../services/complaintsService';
-const classroomsRouter: Router = express.Router();
+const classroomRouter: Router = express.Router();
 
-classroomsRouter.post(
+classroomRouter.post(
   '/:id',
   authenticate(),
   async (req: Request, res: Response, next: NextFunction) => {
@@ -22,11 +22,12 @@ classroomsRouter.post(
   },
 );
 
-classroomsRouter.get(
-  '/:id',
+classroomRouter.get(
+  '/1',
   authenticate(),
   async (req: Request, res: Response, next: NextFunction) => {
-    const classroomIdStr = req.params.id;
+    console.log('yo');
+    const classroomIdStr = '1';
 
     try {
       const classroomId = parseInt(classroomIdStr);
@@ -34,6 +35,7 @@ classroomsRouter.get(
         classroomId,
         req.user.id,
       );
+      console.log(complaints);
       res.json(complaints);
     } catch (err) {
       next(err);
@@ -41,4 +43,4 @@ classroomsRouter.get(
   },
 );
 
-export default classroomsRouter;
+export default classroomRouter;

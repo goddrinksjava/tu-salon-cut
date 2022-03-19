@@ -1,29 +1,42 @@
-import express, { Application, json } from 'express';
+import express, { Application, Request, Response, NextFunction } from 'express';
 import authRouter from './routes/auth';
-import session from 'express-session';
+import session, { MemoryStore } from 'express-session';
 import connect from 'connect-redis';
 import redis from './redis';
-import classroomsRouter from './routes/classrooms';
+import classroomRouter from './routes/classroom';
+import cors from 'cors';
 
 const app: Application = express();
 
 // app.set('trust proxy', 1);
 
 let RedisStore = connect(session);
+
+app.use(
+  cors({
+    origin: ['http://localhost:3000', 'http://frontend:3000'],
+  }),
+);
+
 app.use(
   session({
-    store: new RedisStore({ client: redis }),
+    store: new MemoryStore(),
     // Use an array of secrets to support key rotation as an additional security measure.
-    secret: [process.env.SESSION_SECRET_1, process.env.SESSION_SECRET_2],
-    resave: false,
-    saveUninitialized: false,
-    cookie: { secure: false },
+    secret: 'secret',
+    resave: true,
+    saveUninitialized: true,
+    cookie: {
+      secure: false,
+      httpOnly: true,
+      sameSite: 'none',
+      maxAge: 1000 * 60 * 10,
+    },
   }),
 );
 
 app.use(express.json());
 
 app.use('/auth', authRouter);
-app.use('/classrooms', classroomsRouter);
+app.use('/classroom', classroomRouter);
 
 export default app;

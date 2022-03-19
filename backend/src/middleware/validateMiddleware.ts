@@ -9,7 +9,7 @@ const validateBody =
       return next();
     } catch (err) {
       if (err instanceof ValidationError) {
-        return res.sendStatus(400);
+        return res.sendStatus(403);
       }
       return res.sendStatus(500);
     }
