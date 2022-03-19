@@ -7,6 +7,23 @@ import { credentialsSchema } from '../schema/credentials';
 
 const authRouter: Router = express.Router();
 
+authRouter.get(
+  '/logout',
+  async (req: Request, res: Response, next: NextFunction) => {
+    if (req.session) {
+      req.session.destroy((err) => {
+        if (err) {
+          res.status(400).send('Unable to log out');
+        } else {
+          res.sendStatus(200);
+        }
+      });
+    } else {
+      res.sendStatus(200);
+    }
+  },
+);
+
 authRouter.post(
   '/login',
   validateBody(credentialsSchema),
@@ -26,8 +43,7 @@ authRouter.post(
         return res.sendStatus(200);
       }
 
-      res.status(403);
-      return res.json({ error: 'Email o contraseña incorrectos' });
+      return res.status(403).json({ error: 'Email o contraseña incorrectos' });
     } catch (err) {
       next(err);
     }
@@ -41,7 +57,9 @@ authRouter.post(
     try {
       const result = await createUser(req.body.email, req.body.password);
       if (result == 'EmailTaken') {
-        return res.json({ error: 'Este email ya ha sido registrado' });
+        return res
+          .status(400)
+          .json({ error: 'Este email ya ha sido registrado' });
       }
 
       req.session.user = {
