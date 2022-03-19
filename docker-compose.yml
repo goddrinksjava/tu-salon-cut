@@ -85,6 +85,8 @@ services:
       dockerfile: ./docker/frontend/Dockerfile
     command: sh -c "yarn install && yarn start:dev"
     restart: always
+    environment:
+      - API_PATH=http://backend:4000
     volumes:
       - ./frontend:/home/node/app/frontend
     ports:
