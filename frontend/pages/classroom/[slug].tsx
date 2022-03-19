@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
+import ClassroomProblem from '../../components/ClassroomProblem';
 
 interface IClassroomProblemsProps {
   label: string;
@@ -14,13 +15,7 @@ const ClassroomProblems: NextPage<{ data: IClassroomProblemsProps[] }> = (
   return (
     <>
       {props.data.map(({ label, count, checked }) => {
-        return (
-          <div key={label}>
-            <p>{label}</p>
-            <p>{count}</p>
-            <p>{checked}</p>
-          </div>
-        );
+        return <ClassroomProblem label={label} count={count} />;
       })}
     </>
   );

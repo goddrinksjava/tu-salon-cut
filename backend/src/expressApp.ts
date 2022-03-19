@@ -20,7 +20,7 @@ app.use(
 
 app.use(
   session({
-    store: new MemoryStore(),
+    store: new RedisStore({ client: redis }),
     // Use an array of secrets to support key rotation as an additional security measure.
     secret: 'secret',
     resave: true,
