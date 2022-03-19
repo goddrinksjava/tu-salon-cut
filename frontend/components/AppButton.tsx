@@ -6,14 +6,13 @@ import React, { FC } from 'react';
 
 interface IAppButtonProps {
   type?: 'submit' | 'reset' | 'button';
-  text: string;
   color: 'cyan' | 'green';
   disabled?: boolean;
 }
 
 const AppButton: FC<IAppButtonProps> = ({
   color,
-  text,
+  children,
   type,
   disabled = false,
 }) => {
@@ -23,7 +22,7 @@ const AppButton: FC<IAppButtonProps> = ({
       type={type}
       className={`w-full px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-${color}-600 rounded-md hover:bg-${color}-500 focus:outline-none focus:bg-${color}-500 focus:ring focus:ring-${color}-400 focus:ring-opacity-50`}
     >
-      {text}
+      {children}
     </button>
   );
 };

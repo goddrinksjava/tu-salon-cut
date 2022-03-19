@@ -18,7 +18,8 @@ const signupSchema = yup.object().shape({
 
   passwordConfirmation: yup
     .string()
-    .oneOf([yup.ref('password'), null], 'Las contraseñas deben coincidir'),
+    .oneOf([yup.ref('password'), null], 'Las contraseñas deben coincidir')
+    .required('Las contraseñas deben coincidir'),
 });
 
 export { signupSchema };

@@ -6,6 +6,7 @@ import AppButton from '../components/AppButton';
 import { loginSchema } from '../schema/login';
 import AppError from '../components/AppError';
 import { useRouter } from 'next/router';
+import { signupSchema } from '../schema/signup';
 import Link from 'next/link';
 import AppLink from '../components/AppLink';
 
@@ -32,22 +33,28 @@ const Editor: NextPage = () => {
           {error ? <AppError error={error} /> : null}
 
           <Formik
-            initialValues={{ email: '', password: '' }}
-            validationSchema={loginSchema}
+            initialValues={{
+              email: '',
+              password: '',
+              passwordConfirmation: '',
+            }}
+            validationSchema={signupSchema}
             onSubmit={async (data) => {
-              const response = await fetch('/api/auth/login', {
+              const { passwordConfirmation, ...submitData } = data;
+
+              const response = await fetch('/api/auth/signup', {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(data),
+                body: JSON.stringify(submitData),
               });
 
               console.log(response);
 
               if (response.status == 200) {
                 router.push('/');
-              } else if (response.status == 403) {
+              } else if (response.status == 400) {
                 const obj = await response.json();
                 setError(obj.error);
               } else if (response.status == 500) {
@@ -68,34 +75,32 @@ const Editor: NextPage = () => {
                   </div>
 
                   <div className="mt-6">
-                    <div className="flex justify-between mb-2">
-                      <label
-                        htmlFor="password"
-                        className="text-sm text-gray-600"
-                      >
-                        Contraseña
-                      </label>
-                      <a
-                        href="#"
-                        className="text-sm text-gray-400 focus:text-blue-500 hover:text-blue-500 hover:underline"
-                      >
-                        Olvidaste tu contraseña?
-                      </a>
-                    </div>
-
                     <AppTextInput
+                      autoComplete="new-password"
                       name="password"
                       type="password"
+                      label="Contraseña"
                       placeholder="Tu Contraseña"
                     />
                   </div>
+
+                  <div className="mt-6">
+                    <AppTextInput
+                      autoComplete="new-password"
+                      name="passwordConfirmation"
+                      type="password"
+                      label="Confirma tu contraseña"
+                      placeholder="Tu Contraseña"
+                    />
+                  </div>
+
                   <div className="mt-6">
                     <AppButton
                       color="cyan"
                       type="submit"
                       disabled={isSubmitting}
                     >
-                      Iniciar Sesión
+                      Crear Cuenta
                     </AppButton>
                   </div>
                 </Form>
@@ -105,8 +110,8 @@ const Editor: NextPage = () => {
                 </div>
 
                 <div>
-                  <AppLink href="/signup" color="green">
-                    Crear Cuenta
+                  <AppLink href="/login" color="green">
+                    Iniciar Sesión
                   </AppLink>
                 </div>
               </div>
