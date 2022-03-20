@@ -14,8 +14,8 @@ export async function seed(knex: Knex): Promise<void> {
 
   // Inserts seed entries
   await knex('classroom_complaints').insert([
-    { fk_user: 2, fk_classroom: 1, fk_classroom_problem: 1 },
-    { fk_user: 3, fk_classroom: 1, fk_classroom_problem: 1 },
-    { fk_user: 2, fk_classroom: 1, fk_classroom_problem: 2 },
+    { fk_user: 2, fk_classroom: 'A101', fk_classroom_problem: 1 },
+    { fk_user: 3, fk_classroom: 'A101', fk_classroom_problem: 1 },
+    { fk_user: 2, fk_classroom: 'A101', fk_classroom_problem: 2 },
   ]);
 }

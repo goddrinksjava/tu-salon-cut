@@ -2,20 +2,26 @@ import * as express from 'express';
 import { NextFunction, Request, Response, Router } from 'express';
 import authenticate from '../middleware/authenticateMiddleware';
 import {
+  classroomExists,
   getComplaintsWithCheckedByUser,
   setComplaints,
 } from '../services/complaintsService';
 const classroomRouter: Router = express.Router();
 
 classroomRouter.post(
-  '/:id',
+  '/:name',
   authenticate(),
   async (req: Request, res: Response, next: NextFunction) => {
-    const classroomIdStr = req.params.id;
+    const classroomName = req.params.name;
 
     try {
-      const classroomId = parseInt(classroomIdStr);
-      setComplaints(req.user.id, classroomId, req.body.classroomProblemsId);
+      await setComplaints(
+        req.user.id,
+        classroomName,
+        req.body.classroomProblemsId,
+      );
+
+      res.sendStatus(200);
     } catch (err) {
       next(err);
     }
@@ -23,18 +29,29 @@ classroomRouter.post(
 );
 
 classroomRouter.get(
-  '/1',
+  '/:name',
   authenticate(),
   async (req: Request, res: Response, next: NextFunction) => {
-    console.log('yo');
-    const classroomIdStr = '1';
+    const classroomName = req.params.name;
 
     try {
-      const classroomId = parseInt(classroomIdStr);
-      const complaints = await getComplaintsWithCheckedByUser(
-        classroomId,
+      const existsPromise = classroomExists(classroomName);
+      const complaintsPromise = getComplaintsWithCheckedByUser(
+        classroomName,
         req.user.id,
       );
+
+      const [exists, complaints] = await Promise.all([
+        existsPromise,
+        complaintsPromise,
+      ]);
+
+      console.log(exists);
+
+      if (!exists) {
+        res.sendStatus(404);
+      }
+
       console.log(complaints);
       res.json(complaints);
     } catch (err) {

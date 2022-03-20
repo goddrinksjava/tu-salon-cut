@@ -1,21 +1,82 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { GetServerSideProps, NextPage } from 'next';
 import ClassroomProblem from '../../components/ClassroomProblem';
+import AppButton from '../../components/AppButton';
+import { useRouter } from 'next/router';
+
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 interface IClassroomProblemsProps {
+  id: number;
   label: string;
   count: string;
   checked: boolean;
 }
 
-const ClassroomProblems: NextPage<{ data: IClassroomProblemsProps[] }> = (
-  props,
-) => {
+const ClassroomProblems: NextPage<{
+  data: IClassroomProblemsProps[];
+}> = ({ data }) => {
+  const router = useRouter();
+  const { slug } = router.query;
+
+  const [sending, setSending] = useState(false);
+
+  const stateArray = data.map(({ checked }) => useState(checked));
+
+  const save = async () => {
+    setSending(true);
+
+    // const response = await fetch('/api/auth/signup', {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: JSON.stringify(submitData),
+    // });
+
+    let submitData: { classroomProblemsId: number[] } = {
+      classroomProblemsId: [],
+    };
+
+    for (let i = 0; i < stateArray.length; i++) {
+      if (stateArray[i][0]) {
+        submitData.classroomProblemsId.push(data[i].id);
+      }
+    }
+
+    console.log(submitData);
+
+    const response = await fetch('/api/classroom/' + slug, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(submitData),
+    });
+
+    console.log(response);
+
+    setSending(false);
+  };
+
   return (
     <>
-      {props.data.map(({ label, count, checked }) => {
-        return <ClassroomProblem key={label} label={label} count={count} />;
+      {data.map(({ id, label, count, checked }, i) => {
+        return (
+          <ClassroomProblem
+            key={id}
+            label={label}
+            count={parseInt(count)}
+            checked={stateArray[i][0]}
+            setChecked={stateArray[i][1]}
+          />
+        );
       })}
+      <div className="mt-4">
+        <AppButton color="cyan" disabled={sending} onclick={save}>
+          Guardar
+        </AppButton>
+      </div>
     </>
   );
 };
@@ -47,7 +108,6 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   console.log(response);
 
-  //TODO handle 404
   if (response.ok) {
     const data = await response.json();
     return { props: { data } };

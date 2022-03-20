@@ -45,9 +45,7 @@ const Editor: NextPage = () => {
                 passwordConfirmation: '',
               }}
               validationSchema={signupSchema}
-              onSubmit={async (data) => {
-                const { passwordConfirmation, ...submitData } = data;
-
+              onSubmit={async ({ passwordConfirmation, ...submitData }) => {
                 const response = await fetch('/api/auth/signup', {
                   method: 'POST',
                   headers: {

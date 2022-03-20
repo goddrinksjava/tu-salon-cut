@@ -1,6 +1,6 @@
 import { Knex } from 'knex';
 
-const names = [
+const ids = [
   'A101',
   'A102',
   'A103',
@@ -14,12 +14,12 @@ const names = [
 
 export async function up(knex: Knex): Promise<void> {
   await knex('classrooms').insert(
-    names.map((name) => ({
-      name,
+    ids.map((id) => ({
+      id,
     })),
   );
 }
 
 export async function down(knex: Knex): Promise<void> {
-  await knex('classrooms').del().whereIn('name', names);
+  await knex('classrooms').del().whereIn('id', ids);
 }

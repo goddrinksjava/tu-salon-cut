@@ -29,7 +29,7 @@ app.use(
       secure: false,
       httpOnly: true,
       sameSite: 'none',
-      maxAge: 1000 * 60 * 10,
+      maxAge: 1000 * 60 * 60 * 4, // 4 hours
     },
   }),
 );

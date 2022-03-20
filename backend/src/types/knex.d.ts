@@ -19,11 +19,7 @@ declare module 'knex/types/tables' {
       Partial<Omit<User, 'id' | 'is_admin'>>
     >;
 
-    classrooms: Knex.CompositeTableType<
-      Classroom,
-      Partial<Omit<Classroom, 'id'>>,
-      Partial<Omit<Classroom, 'id'>>
-    >;
+    classrooms: Classroom;
 
     classroom_problems: Knex.CompositeTableType<
       ClassroomProblem,

@@ -10,25 +10,28 @@ import db from '../knex';
 
 const setComplaints = async (
   userId: number,
-  classroomId: number,
+  classroomName: string,
   classroomProblemsId: number[],
 ): Promise<void> => {
   const inserts = classroomProblemsId.map((classroomProblemId) => ({
     fk_user: userId,
-    fk_classroom: classroomId,
+    fk_classroom: classroomName,
     fk_classroom_problem: classroomProblemId,
   }));
 
   const trx = await db.transaction();
 
+  console.log(inserts);
+
   try {
     await db('classroom_complaints')
       .transacting(trx)
       .del()
-      .where({ fk_user: userId, fk_classroom: classroomId })
-      .insert(inserts);
+      .where({ fk_user: userId, fk_classroom: classroomName });
 
-    await db('classroom_complaints').transacting(trx).insert(inserts);
+    if (inserts.length > 0) {
+      await db('classroom_complaints').transacting(trx).insert(inserts);
+    }
 
     await trx.commit();
   } catch (err) {
@@ -43,11 +46,11 @@ interface IGetComplaintsWithCheckedByUserOutput {
 }
 
 const getComplaintsWithCheckedByUser = async (
-  classroomId: number,
+  classroomName: string,
   userId: number,
 ): Promise<IGetComplaintsWithCheckedByUserOutput[]> => {
-  const promise1 = getComplaints(classroomId);
-  const promise2 = getUserComplaints(classroomId, userId);
+  const promise1 = getComplaints(classroomName);
+  const promise2 = getUserComplaints(classroomName, userId);
 
   const [complaints, userComplaints] = await Promise.all([promise1, promise2]);
 
@@ -59,25 +62,33 @@ const getComplaintsWithCheckedByUser = async (
   });
 };
 
+const classroomExists = async (classroomName: string): Promise<boolean> => {
+  const result = (await db.select(
+    db.raw('exists(select 1 from classrooms where id=?)', classroomName),
+  )) as any[];
+
+  return result.at(0).exists;
+};
+
 const getComplaints = async (
-  classroomId: number,
+  classroomName: string,
 ): Promise<{ label: string; count: string }[]> => {
   const result = db('classroom_problems')
     .leftJoin('classroom_complaints', function () {
       this.on(
         'classroom_problems.id',
         'classroom_complaints.fk_classroom_problem',
-      ).andOnVal('classroom_complaints.fk_classroom', classroomId);
+      ).andOnVal('classroom_complaints.fk_classroom', classroomName);
     })
     .count('classroom_complaints.fk_classroom_problem')
-    .select('classroom_problems.label')
-    .groupBy('classroom_problems.label');
+    .select('classroom_problems.label', 'id')
+    .groupBy('classroom_problems.label', 'id');
 
   return result;
 };
 
 const getUserComplaints = async (
-  classroomId: number,
+  classroomName: string,
   userId: number,
 ): Promise<string[]> => {
   const result = db('classroom_complaints')
@@ -87,7 +98,7 @@ const getUserComplaints = async (
       'classroom_complaints.fk_classroom_problem',
     )
     .pluck('classroom_problems.label')
-    .where({ fk_classroom: classroomId, fk_user: userId });
+    .where({ fk_classroom: classroomName, fk_user: userId });
 
   return result;
 };
@@ -97,4 +108,5 @@ export {
   getUserComplaints,
   getComplaintsWithCheckedByUser,
   setComplaints,
+  classroomExists,
 };
