@@ -17,22 +17,15 @@ const ClassroomProblems: NextPage<{
   data: IClassroomProblemsProps[];
 }> = ({ data }) => {
   const router = useRouter();
-  const { slug } = router.query;
+  const { id } = router.query;
 
   const [sending, setSending] = useState(false);
+  const [msg, setMsg] = useState<string | null>(null);
 
   const stateArray = data.map(({ checked }) => useState(checked));
 
   const save = async () => {
     setSending(true);
-
-    // const response = await fetch('/api/auth/signup', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify(submitData),
-    // });
 
     let submitData: { classroomProblemsId: number[] } = {
       classroomProblemsId: [],
@@ -46,13 +39,19 @@ const ClassroomProblems: NextPage<{
 
     console.log(submitData);
 
-    const response = await fetch('/api/classroom/' + slug, {
+    const response = await fetch('/api/classroom/' + id, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(submitData),
     });
+
+    if (response.ok) {
+      setMsg('Datos guardados');
+    } else {
+      setMsg('Error al guardar los datos');
+    }
 
     console.log(response);
 
@@ -77,6 +76,8 @@ const ClassroomProblems: NextPage<{
           Guardar
         </AppButton>
       </div>
+
+      {msg ? <p>{msg}</p> : null}
     </>
   );
 };
@@ -94,10 +95,10 @@ export const getServerSideProps: GetServerSideProps = async ({
     };
   }
 
-  console.log(query.slug);
+  console.log(query.id);
 
   const response = await fetch(
-    `${process.env.API_PATH}/classroom/${query.slug}`,
+    `${process.env.API_PATH}/classroom/${query.id}`,
     {
       credentials: 'include',
       headers: {

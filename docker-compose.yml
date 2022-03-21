@@ -92,6 +92,13 @@ services:
     ports:
       - '3000:3000'
 
+  mailhog:
+    image: mailhog/mailhog
+    restart: always
+    ports:
+      - 1025:1025 # smtp server
+      - 8025:8025 # web ui
+
 volumes:
   db:
     driver: local
