@@ -4,8 +4,6 @@ import ClassroomProblem from '../../components/ClassroomProblem';
 import AppButton from '../../components/AppButton';
 import { useRouter } from 'next/router';
 
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-
 interface IClassroomProblemsProps {
   id: number;
   label: string;
@@ -39,7 +37,7 @@ const ClassroomProblems: NextPage<{
 
     console.log(submitData);
 
-    const response = await fetch('/api/classroom/' + id, {
+    const response = await fetch('/api/complaints/' + id, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -60,6 +58,7 @@ const ClassroomProblems: NextPage<{
 
   return (
     <>
+      <h1 className="text-5xl">{id}</h1>
       {data.map(({ id, label, count, checked }, i) => {
         return (
           <ClassroomProblem
@@ -78,6 +77,15 @@ const ClassroomProblems: NextPage<{
       </div>
 
       {msg ? <p>{msg}</p> : null}
+      <div className="mb-6">
+        <label
+          htmlFor="large-input"
+          className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+        >
+          Large input
+        </label>
+        <textarea className="resize-none h-32 px-3 py-2 text-base text-gray-700 placeholder-gray-600 border rounded-lg focus:shadow-outline"></textarea>
+      </div>
     </>
   );
 };
@@ -98,9 +106,8 @@ export const getServerSideProps: GetServerSideProps = async ({
   console.log(query.id);
 
   const response = await fetch(
-    `${process.env.API_PATH}/classroom/${query.id}`,
+    `${process.env.API_PATH}/complaints/${query.id}`,
     {
-      credentials: 'include',
       headers: {
         cookie: `connect.sid=${req.cookies['connect.sid']}`,
       },

@@ -4,6 +4,7 @@ const credentialsSchema = yup.object().shape({
   email: yup
     .string()
     .required('Email requerido')
+    .lowercase()
     .email('Email es invalido')
     .matches(
       /^.+@(alumno|alumnos).udg.mx$/,

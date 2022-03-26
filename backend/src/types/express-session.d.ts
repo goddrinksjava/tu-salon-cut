@@ -2,6 +2,13 @@ import {} from 'express-session';
 
 declare module 'express-session' {
   export interface SessionData {
-    user: { id: number; email: string; isAdmin: boolean } | undefined;
+    user:
+      | {
+          id: number;
+          email: string;
+          emailValidated: boolean;
+          isAdmin: boolean;
+        }
+      | undefined;
   }
 }

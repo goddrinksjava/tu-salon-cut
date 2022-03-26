@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response, Router } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { AnySchema, ValidationError } from 'yup';
 
 const validateBody =

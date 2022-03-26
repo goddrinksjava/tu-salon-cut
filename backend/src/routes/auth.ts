@@ -1,9 +1,14 @@
 import * as express from 'express';
 import { NextFunction, Request, Response, Router } from 'express';
 import argon2 from 'argon2';
-import { createUser, getUserByEmail } from '../services/userService';
+import {
+  createUser,
+  getUserByEmail,
+  isEmailValidated,
+} from '../services/userService';
 import validateBody from '../middleware/validateMiddleware';
 import { credentialsSchema } from '../schema/credentials';
+import redis from '../redis';
 
 const authRouter: Router = express.Router();
 
@@ -38,6 +43,7 @@ authRouter.post(
         req.session.user = {
           id: user.id,
           email: user.email,
+          emailValidated: await isEmailValidated(user.id),
           isAdmin: user.is_admin,
         };
 
@@ -46,7 +52,7 @@ authRouter.post(
           next(err);
         });
 
-        console.log(req.session);
+        redis.lpush(`userSessions:${user.id}`, req.sessionID);
 
         return res.sendStatus(200);
       }
@@ -73,15 +79,11 @@ authRouter.post(
       req.session.user = {
         id: result.id,
         email: result.email,
+        emailValidated: false,
         isAdmin: result.is_admin,
       };
 
-      req.session.save(function (err) {
-        console.error(err);
-        next(err);
-      });
-
-      console.log(req.session);
+      redis.lpush(`userSessions:${result.id}`, req.sessionID);
 
       res.sendStatus(200);
     } catch (err) {

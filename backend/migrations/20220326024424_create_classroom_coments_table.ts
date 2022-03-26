@@ -1,7 +1,7 @@
 import { Knex } from 'knex';
 
 export async function up(knex: Knex): Promise<void> {
-  await knex.schema.createTable('classroom_complaints', function (table) {
+  await knex.schema.createTable('classroom_comments', function (table) {
     table
       .integer('fk_user')
       .notNullable()
@@ -18,20 +18,14 @@ export async function up(knex: Knex): Promise<void> {
       .onDelete('cascade')
       .onUpdate('cascade');
 
-    table
-      .integer('fk_classroom_problem')
-      .notNullable()
-      .references('id')
-      .inTable('classroom_problems')
-      .onDelete('cascade')
-      .onUpdate('cascade');
+    table.string('comment').notNullable();
 
     table.timestamps(true, true);
 
-    table.primary(['fk_user', 'fk_classroom', 'fk_classroom_problem']);
+    table.primary(['fk_user', 'fk_classroom']);
   });
 }
 
 export async function down(knex: Knex): Promise<void> {
-  await knex.schema.dropTableIfExists('classroom_complaints');
+  await knex.schema.dropTableIfExists('classroom_comments');
 }

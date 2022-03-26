@@ -1,23 +1,26 @@
 import * as express from 'express';
 import { NextFunction, Request, Response, Router } from 'express';
 import authenticate from '../middleware/authenticateMiddleware';
+import validateBody from '../middleware/validateMiddleware';
+import { classroomProblemsIdSchema } from '../schema/classroomProblemsId';
 import {
   classroomExists,
   getComplaintsWithCheckedByUser,
   setComplaints,
 } from '../services/complaintsService';
-const classroomRouter: Router = express.Router();
+const complaintsRouter: Router = express.Router();
 
-classroomRouter.post(
-  '/:name',
+complaintsRouter.post(
+  '/:classroomId',
+  validateBody(classroomProblemsIdSchema),
   authenticate(),
   async (req: Request, res: Response, next: NextFunction) => {
-    const classroomName = req.params.name;
+    const { classroomId } = req.params;
 
     try {
       await setComplaints(
         req.user.id,
-        classroomName,
+        classroomId,
         req.body.classroomProblemsId,
       );
 
@@ -28,16 +31,16 @@ classroomRouter.post(
   },
 );
 
-classroomRouter.get(
-  '/:name',
+complaintsRouter.get(
+  '/:classroomId',
   authenticate(),
   async (req: Request, res: Response, next: NextFunction) => {
-    const classroomName = req.params.name;
+    const { classroomId } = req.params;
 
     try {
-      const existsPromise = classroomExists(classroomName);
+      const existsPromise = classroomExists(classroomId);
       const complaintsPromise = getComplaintsWithCheckedByUser(
-        classroomName,
+        classroomId,
         req.user.id,
       );
 
@@ -60,4 +63,4 @@ classroomRouter.get(
   },
 );
 
-export default classroomRouter;
+export default complaintsRouter;

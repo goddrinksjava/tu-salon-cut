@@ -1,5 +1,6 @@
 import { Knex } from 'knex';
 import Classroom from './classroom';
+import ClassroomComment from './classroomComment';
 import ClassroomComplaint from './classroomComplaint';
 import ClassroomProblem from './classroomProblem';
 import User from './user';
@@ -33,8 +34,13 @@ declare module 'knex/types/tables' {
         ClassroomComplaint,
         'fk_user' | 'fk_classroom' | 'fk_classroom_problem'
       > &
-        Partial<Pick<ClassroomComplaint, 'created_at' | 'updated_at'>>,
-      Partial<Omit<ClassroomComplaint, 'id'>>
+        Partial<Pick<ClassroomComplaint, 'created_at' | 'updated_at'>>
+    >;
+
+    classroom_comments: Knex.CompositeTableType<
+      ClassroomComment,
+      Pick<ClassroomComment, 'fk_user' | 'fk_classroom' | 'comment'> &
+        Partial<Pick<ClassroomComplaint, 'created_at' | 'updated_at'>>
     >;
   }
 }

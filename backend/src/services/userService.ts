@@ -63,4 +63,12 @@ const confirmEmail = async (uuid: string) => {
   redis.del(uuid);
 };
 
-export { createUser, getUserByEmail };
+const isEmailValidated = async (userId: number): Promise<boolean> => {
+  const email_validated_at = await db('users')
+    .select('email_validated_at')
+    .where({ id: userId });
+
+  return email_validated_at == null;
+};
+
+export { createUser, getUserByEmail, isEmailValidated };

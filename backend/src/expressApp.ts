@@ -1,10 +1,11 @@
-import express, { Application, Request, Response, NextFunction } from 'express';
+import express, { Application } from 'express';
 import authRouter from './routes/auth';
-import session, { MemoryStore } from 'express-session';
+import session from 'express-session';
 import connect from 'connect-redis';
 import redis from './redis';
-import classroomRouter from './routes/classroom';
-import cors from 'cors';
+import complaintsRouter from './routes/complaints';
+import sessionConfig from './config/sessionConfig';
+import commentsRouter from './routes/comments';
 
 const app: Application = express();
 
@@ -13,30 +14,16 @@ const app: Application = express();
 let RedisStore = connect(session);
 
 app.use(
-  cors({
-    origin: ['http://localhost:3000', 'http://frontend:3000'],
-  }),
-);
-
-app.use(
   session({
     store: new RedisStore({ client: redis }),
-    // Use an array of secrets to support key rotation as an additional security measure.
-    secret: 'secret',
-    resave: true,
-    saveUninitialized: true,
-    cookie: {
-      secure: false,
-      httpOnly: true,
-      sameSite: 'none',
-      maxAge: 1000 * 60 * 60 * 4, // 4 hours
-    },
+    ...sessionConfig,
   }),
 );
 
 app.use(express.json());
 
 app.use('/auth', authRouter);
-app.use('/classroom', classroomRouter);
+app.use('/complaints', complaintsRouter);
+app.use('/comments', commentsRouter);
 
 export default app;
