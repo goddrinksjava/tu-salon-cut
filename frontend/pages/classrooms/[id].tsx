@@ -4,7 +4,10 @@ import ClassroomProblem from '../../components/ClassroomProblem';
 import AppButton from '../../components/AppButton';
 import { useRouter } from 'next/router';
 
-interface IClassroomProblemsProps {
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+interface IClassroomComplaints {
   id: number;
   label: string;
   count: string;
@@ -12,18 +15,19 @@ interface IClassroomProblemsProps {
 }
 
 const ClassroomProblems: NextPage<{
-  data: IClassroomProblemsProps[];
-}> = ({ data }) => {
+  complaints: IClassroomComplaints[];
+  comment: string | null;
+}> = ({ complaints, comment }) => {
   const router = useRouter();
   const { id } = router.query;
 
-  const [sending, setSending] = useState(false);
-  const [msg, setMsg] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [commentState, setCommentState] = useState<string | null>(comment);
 
-  const stateArray = data.map(({ checked }) => useState(checked));
+  const stateArray = complaints.map(({ checked }) => useState(checked));
 
   const save = async () => {
-    setSending(true);
+    setSaving(true);
 
     let submitData: { classroomProblemsId: number[] } = {
       classroomProblemsId: [],
@@ -31,13 +35,13 @@ const ClassroomProblems: NextPage<{
 
     for (let i = 0; i < stateArray.length; i++) {
       if (stateArray[i][0]) {
-        submitData.classroomProblemsId.push(data[i].id);
+        submitData.classroomProblemsId.push(complaints[i].id);
       }
     }
 
     console.log(submitData);
 
-    const response = await fetch('/api/complaints/' + id, {
+    const complaintsResponse = await fetch('/api/complaints/' + id, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -45,46 +49,73 @@ const ClassroomProblems: NextPage<{
       body: JSON.stringify(submitData),
     });
 
-    if (response.ok) {
-      setMsg('Datos guardados');
+    const commentResponse = await fetch('/api/comments/' + id, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ comment: commentState }),
+    });
+
+    if (complaintsResponse.ok && commentResponse.ok) {
+      toast('Datos guardados', {
+        type: 'success',
+      });
     } else {
-      setMsg('Error al guardar los datos');
+      if (!complaintsResponse.ok) {
+        toast('Error al guardar las quejas', {
+          type: 'error',
+        });
+      }
+
+      if (!commentResponse.ok) {
+        toast('Error al guardar el comentario', {
+          type: 'error',
+        });
+      }
     }
 
-    console.log(response);
-
-    setSending(false);
+    setSaving(false);
   };
 
   return (
     <>
+      <ToastContainer />
       <h1 className="text-5xl">{id}</h1>
-      {data.map(({ id, label, count, checked }, i) => {
-        return (
-          <ClassroomProblem
-            key={id}
-            label={label}
-            count={parseInt(count)}
-            checked={stateArray[i][0]}
-            setChecked={stateArray[i][1]}
+      <div className="bg-white flex justify-center">
+        <div className="flex-auto flex flex-col pt-8 px-6 mx-auto w-5/12">
+          <label htmlFor="comment" className="text-gray-600 pb-4">
+            Comentario
+          </label>
+
+          <textarea
+            name="comment"
+            value={commentState ?? ''}
+            onChange={(e) => setCommentState(e.target.value)}
+            rows={5}
+            className="block resize-none w-full h-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-md focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40"
           />
-        );
-      })}
-      <div className="mt-4">
-        <AppButton color="cyan" disabled={sending} onclick={save}>
-          Guardar
-        </AppButton>
+        </div>
+
+        <div className="pt-8 px-6 mx-auto w-7/12">
+          {complaints.map(({ id, label, count, checked }, i) => {
+            return (
+              <ClassroomProblem
+                key={id}
+                label={label}
+                count={parseInt(count)}
+                checked={stateArray[i][0]}
+                setChecked={stateArray[i][1]}
+              />
+            );
+          })}
+        </div>
       </div>
 
-      {msg ? <p>{msg}</p> : null}
-      <div className="mb-6">
-        <label
-          htmlFor="large-input"
-          className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-        >
-          Large input
-        </label>
-        <textarea className="resize-none h-32 px-3 py-2 text-base text-gray-700 placeholder-gray-600 border rounded-lg focus:shadow-outline"></textarea>
+      <div className="mt-4 pt-8 px-6 mx-auto">
+        <AppButton color="cyan" disabled={saving} onclick={save}>
+          Guardar
+        </AppButton>
       </div>
     </>
   );
@@ -105,7 +136,7 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   console.log(query.id);
 
-  const response = await fetch(
+  const complaintsPromise = fetch(
     `${process.env.API_PATH}/complaints/${query.id}`,
     {
       headers: {
@@ -114,12 +145,28 @@ export const getServerSideProps: GetServerSideProps = async ({
     },
   );
 
-  console.log(response);
+  const commentPromise = fetch(`${process.env.API_PATH}/comments/${query.id}`, {
+    headers: {
+      cookie: `connect.sid=${req.cookies['connect.sid']}`,
+    },
+  });
 
-  if (response.ok) {
-    const data = await response.json();
-    return { props: { data } };
-  } else if (response.status == 404) {
+  const [complaintsResponse, commentResponse] = await Promise.all([
+    complaintsPromise,
+    commentPromise,
+  ]);
+
+  if (complaintsResponse.ok && commentResponse.ok) {
+    const complaints = await complaintsResponse.json();
+    const { comment } = await commentResponse.json();
+
+    return {
+      props: {
+        complaints,
+        comment,
+      },
+    };
+  } else if (complaintsResponse.status == 404) {
     return {
       notFound: true,
     };

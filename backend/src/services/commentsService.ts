@@ -5,29 +5,45 @@ const setComment = async (
   classroomId: string,
   comment: string,
 ) => {
-  db('classroom_comments')
+  await db('classroom_comments')
     .insert({
       fk_user: userId,
       fk_classroom: classroomId,
       comment,
     })
-    .onConflict()
+    .onConflict(['fk_user', 'fk_classroom'])
     .merge();
+};
+
+const deleteComment = async (userId: number, classroomId: string) => {
+  await db('classroom_comments')
+    .del()
+    .where({ fk_user: userId, fk_classroom: classroomId });
 };
 
 const getComment = async (
   userId: number,
   classroomId: string,
 ): Promise<string | null> => {
-  return db('classroom_comments')
+  const rows = await db('classroom_comments')
     .pluck('comment')
     .where({ fk_user: userId, fk_classroom: classroomId });
+
+  return rows.at(0) || null;
 };
 
-const getClassroomComments = async (classroomId: string): Promise<string[]> => {
-  return db('classroom_comments')
-    .pluck('comment')
+interface IClassroomComments {
+  email: string;
+  comment: string;
+}
+
+const getClassroomComments = async (
+  classroomId: string,
+): Promise<IClassroomComments[]> => {
+  return await db('classroom_comments')
+    .join('users', 'users.id', '=', 'classroom_comments.fk_user')
+    .select('comment', 'email')
     .where({ fk_classroom: classroomId });
 };
 
-export { setComment, getComment, getClassroomComments };
+export { setComment, deleteComment, getComment, getClassroomComments };

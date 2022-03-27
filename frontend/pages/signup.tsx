@@ -3,23 +3,24 @@ import { NextPage } from 'next';
 import AppTextInput from '../components/AppTextInput';
 import { Form, Formik } from 'formik';
 import AppButton from '../components/AppButton';
-import { loginSchema } from '../schema/login';
-import AppError from '../components/AppError';
 import { useRouter } from 'next/router';
 import { signupSchema } from '../schema/signup';
-import Link from 'next/link';
 import AppLink from '../components/AppLink';
 import Head from 'next/head';
 
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 const Editor: NextPage = () => {
   const router = useRouter();
-  const [error, setError] = useState<string | undefined>(undefined);
 
   return (
     <>
       <Head>
         <title>Registro</title>
       </Head>
+
+      <ToastContainer />
 
       <div className="bg-white flex justify-center h-screen md:divide-x">
         <div className="flex-auto hidden md:flex pt-8 lg:pt-0 items-center w-full px-6 mx-auto">
@@ -35,8 +36,6 @@ const Editor: NextPage = () => {
                 Tu Salón CUT
               </h2>
             </div>
-
-            {error ? <AppError error={error} /> : null}
 
             <Formik
               initialValues={{
@@ -60,9 +59,13 @@ const Editor: NextPage = () => {
                   router.push('/');
                 } else if (response.status == 400) {
                   const obj = await response.json();
-                  setError(obj.error);
+                  toast(obj.error, {
+                    type: 'error',
+                  });
                 } else if (response.status == 500) {
-                  setError('Error del servidor, por favor intentalo más tarde');
+                  toast('Error del servidor, por favor intentalo más tarde', {
+                    type: 'error',
+                  });
                 }
               }}
             >

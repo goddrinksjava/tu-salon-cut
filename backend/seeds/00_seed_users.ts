@@ -9,7 +9,7 @@ export async function seed(knex: Knex): Promise<void> {
   await knex('users').insert([
     {
       id: 1,
-      email: 'admin@tusalon.com',
+      email: 'admin@alumno.udg.mx',
       hashed_password: await argon2.hash('adminPassword', {
         type: argon2.argon2id,
       }),

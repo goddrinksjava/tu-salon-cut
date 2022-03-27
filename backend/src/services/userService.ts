@@ -22,7 +22,7 @@ const createUser = async (
       })
       .returning('*');
 
-    const user = result.at(0);
+    const user = result.at(0) || null;
 
     await sendConfirmationEmail(user.id, user.email); //TODO handle exception
 
