@@ -22,7 +22,7 @@ const ClassroomProblems: NextPage<{
   const { id } = router.query;
 
   const [saving, setSaving] = useState(false);
-  const [commentState, setCommentState] = useState<string | null>(comment);
+  const [commentState, setCommentState] = useState<string>(comment ?? '');
 
   const stateArray = complaints.map(({ checked }) => useState(checked));
 

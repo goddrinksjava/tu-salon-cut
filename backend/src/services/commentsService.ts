@@ -35,6 +35,7 @@ const getComment = async (
 interface IClassroomComments {
   email: string;
   comment: string;
+  updated_at: Date;
 }
 
 const getClassroomComments = async (
@@ -42,8 +43,9 @@ const getClassroomComments = async (
 ): Promise<IClassroomComments[]> => {
   return await db('classroom_comments')
     .join('users', 'users.id', '=', 'classroom_comments.fk_user')
-    .select('comment', 'email')
-    .where({ fk_classroom: classroomId });
+    .select('comment', 'email', 'classroom_comments.updated_at')
+    .where({ fk_classroom: classroomId })
+    .orderBy('classroom_comments.updated_at', 'desc');
 };
 
 export { setComment, deleteComment, getComment, getClassroomComments };

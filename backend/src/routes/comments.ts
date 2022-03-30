@@ -18,7 +18,10 @@ commentsRouter.get(
 
     try {
       const comments = await getClassroomComments(classroomId);
-      console.log(comments);
+      comments.forEach(
+        (comment: any) =>
+          (comment.updated_at = comment.updated_at.toLocaleDateString('es-MX')),
+      );
       res.json({ comments });
     } catch (err) {
       next(err);
@@ -26,6 +29,7 @@ commentsRouter.get(
   },
 );
 
+//TODO schema
 commentsRouter.post(
   '/:classroomId',
   authenticate(),

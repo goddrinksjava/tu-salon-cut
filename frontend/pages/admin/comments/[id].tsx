@@ -8,6 +8,7 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 interface IClassroomComments {
   email: string;
   comment: string;
+  updated_at: string;
 }
 
 const ClassroomProblems: NextPage<{
@@ -18,11 +19,14 @@ const ClassroomProblems: NextPage<{
 
   return (
     <>
-      {comments.map(({ email, comment }, i) => {
+      {comments.map(({ email, comment, updated_at }, i) => {
         return (
           <div className="pt-2 px-6">
             <AppInfo key={email}>
-              <p className="font-bold">{email}</p>
+              <div className="flex justify-between pb-4">
+                <p className="font-bold">{email}</p>
+                <p className="font-bold">{updated_at}</p>
+              </div>
               <p>{comment}</p>
             </AppInfo>
           </div>

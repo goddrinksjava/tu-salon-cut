@@ -6,6 +6,7 @@ import redis from './redis';
 import complaintsRouter from './routes/complaints';
 import sessionConfig from './config/sessionConfig';
 import commentsRouter from './routes/comments';
+import classroomsRouter from './routes/classrooms';
 
 const app: Application = express();
 
@@ -25,5 +26,6 @@ app.use(express.json());
 app.use('/auth', authRouter);
 app.use('/complaints', complaintsRouter);
 app.use('/comments', commentsRouter);
+app.use('/classrooms', classroomsRouter);
 
 export default app;
