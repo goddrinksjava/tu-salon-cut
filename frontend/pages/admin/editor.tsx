@@ -31,7 +31,6 @@ import Toolbar from '../../components/Toolbar';
 import { withCorrectVoidBehavior } from '../../plugin/CorrectVoidBehaviour';
 import { withImages } from '../../plugin/Images';
 import { withLayout } from '../../plugin/Layout';
-import { withNormalizedTitle } from '../../plugin/NormalizedTitle';
 
 export type ImageElement = {
   type: 'image';
@@ -47,9 +46,7 @@ const ImagesExample = () => {
   const editor = useMemo(
     () =>
       withCorrectVoidBehavior(
-        withNormalizedTitle(
-          withLayout(withImages(withHistory(withReact(createEditor())))),
-        ),
+        withLayout(withImages(withHistory(withReact(createEditor())))),
       ),
 
     [],
