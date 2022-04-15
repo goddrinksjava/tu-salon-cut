@@ -20,19 +20,21 @@ export const withImages = (editor: Editor) => {
     const { files } = data;
 
     if (files && files.length > 0) {
-      for (const file of files) {
-        const reader = new FileReader();
+      const promises = [];
+      for (let file of files) {
         const [mime] = file.type.split('/');
+        if (mime != 'image') continue;
 
-        if (mime === 'image') {
-          reader.addEventListener('load', () => {
-            const url = reader.result;
-            insertImage(editor, url);
-          });
-
+        let filePromise = new Promise<string>((resolve, reject) => {
+          let reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = () => reject(reader.result);
           reader.readAsDataURL(file);
-        }
+        });
+        promises.push(filePromise);
       }
+
+      Promise.all(promises).then((urls) => insertImages(editor, urls));
     } else {
       insertData(data);
     }
@@ -41,8 +43,10 @@ export const withImages = (editor: Editor) => {
   return editor;
 };
 
-export const insertImage = (editor: Editor, url: any) => {
-  const text = { text: '' };
-  const image: ImageElement = { type: 'image', url, children: [text] };
-  Transforms.insertNodes(editor, image);
+export const insertImages = (editor: Editor, urlList: string[]) => {
+  const images = urlList.map<ImageElement>((url) => {
+    return { type: 'image', url, children: [{ text: '' }] };
+  });
+
+  Transforms.insertNodes(editor, images);
 };

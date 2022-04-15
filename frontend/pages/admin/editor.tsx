@@ -9,7 +9,14 @@ import {
   TextUnderline,
   UploadTwo,
 } from '@icon-park/react';
-import React, { FC, useMemo } from 'react';
+import React, {
+  ChangeEventHandler,
+  FC,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {
   Transforms,
   createEditor,
@@ -29,7 +36,7 @@ import {
 import { Image } from '../../components/Image';
 import Toolbar from '../../components/Toolbar';
 import { withCorrectVoidBehavior } from '../../plugin/CorrectVoidBehaviour';
-import { withImages } from '../../plugin/Images';
+import { insertImages, withImages } from '../../plugin/Images';
 import { withLayout } from '../../plugin/Layout';
 
 export type ImageElement = {
@@ -52,53 +59,140 @@ const ImagesExample = () => {
     [],
   );
 
+  const [storage, setStorage] = useState<Storage | null>(null);
+  useEffect(() => setStorage(localStorage), []);
+
+  const initialValue = useMemo(() => {
+    if (!storage) {
+      return defaultValue;
+    }
+
+    const content = storage.getItem('content');
+
+    if (content) {
+      return JSON.parse(content);
+    }
+
+    return defaultValue;
+  }, [storage]);
+
   return (
     <div className="absolute flex justify-center min-w-full min-h-full bg-gray-100">
+      <img
+        src="http://localhost:4000/notices/images/2ca1dde8-fead-4193-86fd-dbec54045587"
+        alt=""
+      />
       <div className="bg-white md:w-5/6 lg:w-3/4 h-fit my-8 p-4 rounded border shadow">
-        <Slate editor={editor} value={initialValue}>
-          <Toolbar>
-            <MarkButton type="bold">
-              <TextBold theme="filled" size="18" />
-            </MarkButton>
-            <MarkButton type="italic">
-              <TextItalic theme="filled" size="18" />
-            </MarkButton>
-            <MarkButton type="underline">
-              <TextUnderline theme="filled" size="18" />
-            </MarkButton>
-            <MarkButton type="h1">
-              <H1 theme="filled" size="18" />
-            </MarkButton>
-            <MarkButton type="h2">
-              <H2 theme="filled" size="18" />
-            </MarkButton>
+        {storage ? (
+          <Slate
+            editor={editor}
+            value={initialValue}
+            onChange={(value) => {
+              const isAstChange = editor.operations.some(
+                (op) => 'set_selection' !== op.type,
+              );
+              if (isAstChange) {
+                const content = JSON.stringify(value);
 
-            <BlockButton type="numbered-list">
-              <OrderedList theme="filled" size="18" />
-            </BlockButton>
-            <BlockButton type="bulleted-list">
-              <MindmapList theme="filled" size="18" />
-            </BlockButton>
+                try {
+                  storage.setItem('content', content);
+                } catch (err) {
+                  console.error(err);
+                }
+              }
+            }}
+          >
+            <Toolbar>
+              <MarkButton type="bold">
+                <TextBold theme="filled" size="18" />
+              </MarkButton>
+              <MarkButton type="italic">
+                <TextItalic theme="filled" size="18" />
+              </MarkButton>
+              <MarkButton type="underline">
+                <TextUnderline theme="filled" size="18" />
+              </MarkButton>
+              <MarkButton type="h1">
+                <H1 theme="filled" size="18" />
+              </MarkButton>
+              <MarkButton type="h2">
+                <H2 theme="filled" size="18" />
+              </MarkButton>
 
-            <button>
-              <Picture theme="filled" size="18" />
-            </button>
+              <BlockButton type="numbered-list">
+                <OrderedList theme="filled" size="18" />
+              </BlockButton>
+              <BlockButton type="bulleted-list">
+                <MindmapList theme="filled" size="18" />
+              </BlockButton>
 
-            <button>
-              <UploadTwo theme="filled" size="18" />
-            </button>
-          </Toolbar>
+              <ImageButton />
 
-          <Editable
-            className="h-full w-full mt-4"
-            renderElement={(props) => <Element {...props} />}
-            renderLeaf={Leaf}
-          />
-        </Slate>
+              <button>
+                <UploadTwo theme="filled" size="18" />
+              </button>
+            </Toolbar>
+
+            <Editable
+              className="h-full w-full mt-4"
+              renderElement={(props) => <Element {...props} />}
+              renderLeaf={Leaf}
+            />
+          </Slate>
+        ) : null}
       </div>
     </div>
   );
 };
+
+const ImageButton: FC = () => {
+  const editor = useSlateStatic();
+  const ref = useRef<HTMLInputElement>(null);
+
+  const handleClick = () => {
+    if (ref.current) {
+      ref.current.click();
+    }
+  };
+
+  const handleFileSelect: ChangeEventHandler<HTMLInputElement> = async (e) => {
+    const files = e.target.files;
+
+    if (files && files.length > 0) {
+      const promises = [];
+      for (let file of files) {
+        const [mime] = file.type.split('/');
+        if (mime != 'image') continue;
+
+        let filePromise = new Promise<string>((resolve, reject) => {
+          let reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = () => reject(reader.result);
+          reader.readAsDataURL(file);
+        });
+        promises.push(filePromise);
+      }
+
+      Promise.all(promises).then((urls) => insertImages(editor, urls));
+    }
+  };
+
+  return (
+    <div className="w-fit h-fit p-0">
+      <input
+        className="hidden"
+        type="file"
+        ref={ref}
+        onChange={handleFileSelect}
+        multiple
+      />
+      <button className="block" onClick={handleClick}>
+        <Picture theme="filled" size="18" />
+      </button>
+    </div>
+  );
+};
+
 const LIST_TYPES = ['numbered-list', 'bulleted-list'];
 
 type MarkType = 'bold' | 'italic' | 'underline' | 'h1' | 'h2';
@@ -254,7 +348,7 @@ const Element = ({ attributes, children, element }: RenderElementProps) => {
       const isEmpty = (element.children.at(0)?.text?.length ?? 1) == 0;
       console.log(isEmpty);
       return (
-        <div className="z-10 relative">
+        <div className="z-10 relative pb-4">
           <p
             className="placeholder text-5xl whitespace-normal text-justify"
             {...attributes}
@@ -306,12 +400,12 @@ const Leaf = ({ attributes, children, leaf }: RenderLeafProps) => {
   return <span {...attributes}>{children}</span>;
 };
 
-const initialValue: Descendant[] = [
+const defaultValue: Descendant[] = [
   {
-    type: 'paragraph',
+    type: 'title',
     children: [
       {
-        text: 'In addition to nodes that contain editable text, you can also create other types of nodes, like images or videos.',
+        text: '',
       },
     ],
   },
@@ -319,15 +413,7 @@ const initialValue: Descendant[] = [
     type: 'paragraph',
     children: [
       {
-        text: 'This example shows images in action. It features two ways to add images. You can either add an image via the toolbar icon above, or if you want in on a little secret, copy an image URL to your clipboard and paste it anywhere in the editor!',
-      },
-    ],
-  },
-  {
-    type: 'paragraph',
-    children: [
-      {
-        text: 'You can delete images with the cross in the top left. Try deleting this sheep:',
+        text: '',
       },
     ],
   },
