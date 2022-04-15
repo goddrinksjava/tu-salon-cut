@@ -15,32 +15,43 @@ export const withImages = (editor: Editor) => {
     return element.type === 'image' ? true : isVoid(element);
   };
 
-  editor.insertData = (data) => {
+  editor.insertData = async (data) => {
     const text = data.getData('text/plain');
     const { files } = data;
 
     if (files && files.length > 0) {
-      const promises = [];
-      for (let file of files) {
-        const [mime] = file.type.split('/');
-        if (mime != 'image') continue;
-
-        let filePromise = new Promise<string>((resolve, reject) => {
-          let reader = new FileReader();
-          reader.onload = () => resolve(reader.result as string);
-          reader.onerror = () => reject(reader.result);
-          reader.readAsDataURL(file);
-        });
-        promises.push(filePromise);
-      }
-
-      Promise.all(promises).then((urls) => insertImages(editor, urls));
+      const { filenames } = await uploadImages(files);
+      insertImages(
+        editor,
+        filenames.map((filename) => `/api/notices/images/${filename}`),
+      );
     } else {
       insertData(data);
     }
   };
 
   return editor;
+};
+
+export const uploadImages = async (
+  files: FileList,
+): Promise<{ filenames: string[] }> => {
+  var data = new FormData();
+  for (const file of files) {
+    const [mime] = file.type.split('/');
+    if (mime != 'image') continue;
+    data.append('files', file, file.name);
+  }
+
+  const response = await fetch('/api/editor/imageUpload', {
+    method: 'POST',
+    // headers: {
+    //   'Content-Type': 'multipart/form-data',
+    // },
+    body: data, // This is your file object
+  });
+
+  return await response.json();
 };
 
 export const insertImages = (editor: Editor, urlList: string[]) => {

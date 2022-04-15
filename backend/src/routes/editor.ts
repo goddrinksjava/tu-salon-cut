@@ -38,10 +38,11 @@ const editorRouter: Router = express.Router();
 
 editorRouter.post(
   '/imageUpload',
-  authenticate({ mustBeAdmin: true }),
-  upload.single('file'),
+  // authenticate({ mustBeAdmin: true }),
+  upload.array('files'),
   async (req: Request, res: Response, next: NextFunction) => {
-    res.json({ filename: req.file.filename, path: req.file.path });
+    const files = req.files as Express.Multer.File[];
+    res.json({ filenames: files.map((f) => f.filename) });
   },
 );
 

@@ -78,10 +78,6 @@ const ImagesExample = () => {
 
   return (
     <div className="absolute flex justify-center min-w-full min-h-full bg-gray-100">
-      <img
-        src="http://localhost:4000/notices/images/2ca1dde8-fead-4193-86fd-dbec54045587"
-        alt=""
-      />
       <div className="bg-white md:w-5/6 lg:w-3/4 h-fit my-8 p-4 rounded border shadow">
         {storage ? (
           <Slate
@@ -243,7 +239,8 @@ const toggleMark = (editor: Editor, mark: MarkType) => {
   const [match] = Array.from(
     Editor.nodes(editor, {
       at: Editor.unhangRange(editor, selection),
-      match: (n) => SlateElement.isElement(n) && n.type == 'title',
+      match: (n) =>
+        SlateElement.isElement(n) && (n.type == 'title' || n.type == 'image'),
     }),
   );
 
@@ -276,7 +273,8 @@ const toggleBlock = (
   const [match] = Array.from(
     Editor.nodes(editor, {
       at: Editor.unhangRange(editor, selection),
-      match: (n) => SlateElement.isElement(n) && n.type == 'title',
+      match: (n) =>
+        SlateElement.isElement(n) && (n.type == 'title' || n.type == 'image'),
     }),
   );
 
@@ -369,7 +367,9 @@ const Element = ({ attributes, children, element }: RenderElementProps) => {
       );
     case 'paragraph':
       return (
-        <p className="whitespace-normal text-justify" {...attributes}>
+        // TODO fix text-justify on firefox
+        // whitespace-normal
+        <p className="text-justify" {...attributes}>
           {children}
         </p>
       );
