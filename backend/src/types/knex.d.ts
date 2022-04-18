@@ -3,6 +3,7 @@ import Classroom from './classroom';
 import ClassroomComment from './classroomComment';
 import ClassroomComplaint from './classroomComplaint';
 import ClassroomProblem from './classroomProblem';
+import Notice from './notice';
 import User from './user';
 
 declare module 'knex/types/tables' {
@@ -41,6 +42,12 @@ declare module 'knex/types/tables' {
       ClassroomComment,
       Pick<ClassroomComment, 'fk_user' | 'fk_classroom' | 'comment'> &
         Partial<Pick<ClassroomComplaint, 'created_at' | 'updated_at'>>
+    >;
+
+    notices: Knex.CompositeTableType<
+      Notice,
+      Pick<Notice, 'document'> &
+        Partial<Pick<Notice, 'is_public' | 'created_at' | 'updated_at'>>
     >;
   }
 }

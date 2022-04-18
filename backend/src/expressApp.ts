@@ -8,6 +8,7 @@ import sessionConfig from './config/sessionConfig';
 import commentsRouter from './routes/comments';
 import classroomsRouter from './routes/classrooms';
 import editorRouter from './routes/editor';
+import noticesRouter from './routes/notices';
 
 const app: Application = express();
 
@@ -28,6 +29,7 @@ app.use('/auth', authRouter);
 app.use('/complaints', complaintsRouter);
 app.use('/comments', commentsRouter);
 app.use('/classrooms', classroomsRouter);
+app.use('/notices', noticesRouter);
 app.use('/editor', editorRouter);
 
 app.use(express.static('public'));

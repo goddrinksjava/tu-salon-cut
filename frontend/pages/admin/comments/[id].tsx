@@ -3,16 +3,14 @@ import { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
 import AppInfo from '../../../components/AppInfo';
 
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-
-interface IClassroomComments {
+interface IClassroomComment {
   email: string;
   comment: string;
   updated_at: string;
 }
 
 const ClassroomProblems: NextPage<{
-  comments: IClassroomComments[];
+  comments: IClassroomComment[];
 }> = ({ comments }) => {
   const router = useRouter();
   const { id } = router.query;

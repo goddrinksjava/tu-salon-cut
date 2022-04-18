@@ -6,7 +6,7 @@ import {
   getUserByEmail,
   isEmailValidated,
 } from '../services/userService';
-import validateBody from '../middleware/validateMiddleware';
+import { validateBody } from '../middleware/validateMiddleware';
 import { credentialsSchema } from '../schema/credentials';
 import redis from '../redis';
 
@@ -89,6 +89,14 @@ authRouter.post(
     } catch (err) {
       next(err);
     }
+  },
+);
+
+authRouter.get(
+  '/isAdmin',
+  async (req: Request, res: Response, next: NextFunction) => {
+    const user = req.session.user;
+    return user && user.isAdmin;
   },
 );
 

@@ -1,18 +1,34 @@
 import { NextFunction, Request, Response } from 'express';
 import { AnySchema, ValidationError } from 'yup';
 
-const validateBody =
+export const validateBody =
   (schema: AnySchema) =>
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      await schema.validate(req.body);
+      const body = await schema.validate(req.body);
+      req.body = body;
       return next();
     } catch (err) {
       if (err instanceof ValidationError) {
-        return res.sendStatus(403);
+        console.log(err);
+        return res.sendStatus(400);
       }
       return res.sendStatus(500);
     }
   };
 
-export default validateBody;
+export const validateQuery =
+  (schema: AnySchema) =>
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const query = await schema.validate(req.query);
+      req.query = query;
+      return next();
+    } catch (err) {
+      if (err instanceof ValidationError) {
+        console.log(err);
+        return res.sendStatus(400);
+      }
+      return res.sendStatus(500);
+    }
+  };

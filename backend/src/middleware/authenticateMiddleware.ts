@@ -5,15 +5,18 @@ const authenticate =
   ({ mustBeAdmin } = { mustBeAdmin: false }) =>
   async (req: Request, res: Response, next: NextFunction) => {
     const user = req.session.user;
-
     console.log(req.sessionID);
 
-    if (user && (!mustBeAdmin || user.isAdmin)) {
-      req.user = user;
-      return next();
+    if (!user) {
+      return res.sendStatus(401);
     }
 
-    res.sendStatus(403);
+    if (mustBeAdmin && !user.isAdmin) {
+      return res.sendStatus(403);
+    }
+
+    req.user = user;
+    next();
   };
 
 export default authenticate;

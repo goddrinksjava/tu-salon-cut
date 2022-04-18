@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { NextPage } from 'next';
+import { GetServerSideProps, NextPage } from 'next';
 import AppTextInput from '../components/AppTextInput';
 import { Form, Formik } from 'formik';
 import AppButton from '../components/AppButton';
@@ -9,10 +9,14 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import AppLink from '../components/AppLink';
 import Head from 'next/head';
+import { INotice } from './admin';
+import PublicNotice from '../components/notice/PublicNotice';
 
-const Editor: NextPage = () => {
+const Editor: NextPage<{ notices: INotice[] }> = ({ notices }) => {
   const router = useRouter();
   const [error, setError] = useState<string | undefined>(undefined);
+
+  console.log(notices);
 
   return (
     <>
@@ -20,14 +24,28 @@ const Editor: NextPage = () => {
         <title>Inicio de sesión</title>
       </Head>
 
-      <div className="bg-white flex justify-center h-screen md:divide-x">
-        <div className="flex-auto hidden md:flex pt-8 lg:pt-0 items-center w-full px-6 mx-auto">
-          <h2 className="text-3xl md:text-5xl xl:text-6xl font-bold text-gray-700">
-            Noticias
-          </h2>
+      <div className="bg-white flex justify-center items-center h-screen md:divide-x">
+        <div className="h-full max-h-screen flex-auto hidden md:flex flex-col w-full mx-auto">
+          <div className="m-auto overflow-y-auto w-full p-6">
+            <h2 className="block mb-4 text-6xl font-bold text-gray-700">
+              Noticias
+            </h2>
+
+            {
+              <div className="space-y-4 w-full">
+                {notices.map((notice) => {
+                  return (
+                    <div className="p-3 rounded border shadow" key={notice.id}>
+                      <PublicNotice notice={notice} />
+                    </div>
+                  );
+                })}
+              </div>
+            }
+          </div>
         </div>
 
-        <div className="flex pt-8 lg:pt-0 md:items-center w-full px-6 mx-auto">
+        <div className="flex pt-8 lg:pt-0 md:items-center w-full h-full max-h-screen px-6 mx-auto">
           <div className="flex-1">
             <div>
               <h2 className="text-3xl md:text-5xl xl:text-6xl font-bold text-gray-700">
@@ -121,7 +139,7 @@ const Editor: NextPage = () => {
           </div>
         </div>
 
-        <div className="flex-auto hidden xl:flex pt-8 lg:pt-0 items-center w-full px-6 mx-auto">
+        <div className="flex-auto hidden xl:flex pt-8 lg:pt-0 items-center w-full h-full max-h-screen px-6 mx-auto">
           <h2 className="text-3xl md:text-5xl xl:text-6xl font-bold text-gray-700">
             Salones
           </h2>
@@ -130,4 +148,26 @@ const Editor: NextPage = () => {
     </>
   );
 };
+
+export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+  const response = await fetch(`${process.env.API_PATH}/notices/public/all`);
+
+  if (response.ok) {
+    const { notices } = await response.json();
+    console.log(notices);
+    return { props: { notices } };
+  } else if (response.status == 404) {
+    return {
+      notFound: true,
+    };
+  } else {
+    return {
+      redirect: {
+        permanent: false,
+        destination: '/login',
+      },
+    };
+  }
+};
+
 export default Editor;

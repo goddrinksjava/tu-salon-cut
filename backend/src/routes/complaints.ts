@@ -1,7 +1,7 @@
 import * as express from 'express';
 import { NextFunction, Request, Response, Router } from 'express';
 import authenticate from '../middleware/authenticateMiddleware';
-import validateBody from '../middleware/validateMiddleware';
+import { validateBody } from '../middleware/validateMiddleware';
 import { classroomProblemsIdSchema } from '../schema/classroomProblemsId';
 import {
   classroomExists,

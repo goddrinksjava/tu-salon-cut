@@ -36,6 +36,7 @@ const setComplaints = async (
     await trx.commit();
   } catch (err) {
     trx.rollback(err);
+    throw err;
   }
 };
 

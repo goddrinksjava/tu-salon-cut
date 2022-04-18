@@ -1,6 +1,3 @@
-import { BaseEditor, Descendant } from 'slate';
-import { ReactEditor } from 'slate-react';
-
 type CustomText = {
   text: string;
 };
@@ -25,16 +22,10 @@ type RichText = {
   h2?: boolean;
 };
 
-declare module 'slate' {
-  interface CustomTypes {
-    Editor: BaseEditor & ReactEditor;
-    Element:
-      | ParagraphElement
-      | ImageElement
-      | ListItem
-      | NumberedList
-      | BulletList
-      | TitleElement;
-    Text: RichText;
-  }
-}
+type Descendant =
+  | ParagraphElement
+  | ImageElement
+  | ListItem
+  | NumberedList
+  | BulletList
+  | TitleElement;

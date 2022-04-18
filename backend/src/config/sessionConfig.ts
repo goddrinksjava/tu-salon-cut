@@ -10,7 +10,7 @@ const sessionConfig: SessionOptions = {
     secure: false,
     httpOnly: true,
     sameSite: 'none',
-    maxAge: 1000 * 60 * 30, // 30 minutes
+    maxAge: 1000 * 60 * 60 * 24, // 1 day
   },
 };
 

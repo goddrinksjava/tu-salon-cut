@@ -1,3 +1,4 @@
+import { FC } from 'react';
 import {
   ReactEditor,
   RenderElementProps,
@@ -5,22 +6,21 @@ import {
   useSelected,
   useSlateStatic,
 } from 'slate-react';
-import { ImageElement } from '../types/slate';
+import { ImageElement } from '../../types/slate';
 
-export const Image = ({
-  attributes,
-  children,
-  element,
-}: RenderElementProps & { element: ImageElement }) => {
+export const NoticeImage: FC<
+  { element: ImageElement; noticeId: number } & RenderElementProps
+> = ({ children, element, noticeId, attributes }) => {
   const editor = useSlateStatic();
   const path = ReactEditor.findPath(editor, element);
 
   const selected = useSelected();
   const focused = useFocused();
   return (
-    <div {...attributes}>
+    <div>
       {children}
       <div
+        {...attributes}
         contentEditable={false}
         className="relative"
         onDrag={(ev) => console.log('yo')}
@@ -30,7 +30,7 @@ export const Image = ({
         />
 
         <img
-          src={element.url}
+          src={`/api/notices/${noticeId}/${element.filename}`}
           className={`relative z-10 w-full ${
             selected && focused ? 'opacity-70' : 'opacity-100'
           }`}

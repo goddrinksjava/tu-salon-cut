@@ -1,14 +1,7 @@
 import { Editor, Transforms } from 'slate';
-import {
-  ReactEditor,
-  RenderElementProps,
-  useFocused,
-  useSelected,
-  useSlateStatic,
-} from 'slate-react';
 import { ImageElement } from '../types/slate';
 
-export const withImages = (editor: Editor) => {
+export const makeImagesPlugin = (noticeId: number) => (editor: Editor) => {
   const { insertData, isVoid } = editor;
 
   editor.isVoid = (element) => {
@@ -20,11 +13,8 @@ export const withImages = (editor: Editor) => {
     const { files } = data;
 
     if (files && files.length > 0) {
-      const { filenames } = await uploadImages(files);
-      insertImages(
-        editor,
-        filenames.map((filename) => `/api/notices/images/${filename}`),
-      );
+      const filenames = await uploadImages(noticeId, files);
+      insertImages(editor, filenames);
     } else {
       insertData(data);
     }
@@ -32,10 +22,12 @@ export const withImages = (editor: Editor) => {
 
   return editor;
 };
+//.map((filename) => `/api/notices/${noticeId}/${filename}`)
 
 export const uploadImages = async (
+  noticeId: number,
   files: FileList,
-): Promise<{ filenames: string[] }> => {
+): Promise<string[]> => {
   var data = new FormData();
   for (const file of files) {
     const [mime] = file.type.split('/');
@@ -43,20 +35,19 @@ export const uploadImages = async (
     data.append('files', file, file.name);
   }
 
-  const response = await fetch('/api/editor/imageUpload', {
+  const response = await fetch(`/api/editor/${noticeId}/imageUpload`, {
     method: 'POST',
-    // headers: {
-    //   'Content-Type': 'multipart/form-data',
-    // },
-    body: data, // This is your file object
+    body: data,
   });
 
-  return await response.json();
+  const { filenames } = await response.json();
+
+  return filenames;
 };
 
-export const insertImages = (editor: Editor, urlList: string[]) => {
-  const images = urlList.map<ImageElement>((url) => {
-    return { type: 'image', url, children: [{ text: '' }] };
+export const insertImages = (editor: Editor, filenames: string[]) => {
+  const images = filenames.map<ImageElement>((filename) => {
+    return { type: 'image', filename, children: [{ text: '' }] };
   });
 
   Transforms.insertNodes(editor, images);

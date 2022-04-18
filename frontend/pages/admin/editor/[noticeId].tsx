@@ -9,14 +9,9 @@ import {
   TextUnderline,
   UploadTwo,
 } from '@icon-park/react';
-import React, {
-  ChangeEventHandler,
-  FC,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { GetServerSideProps, NextPage } from 'next';
+import React, { ChangeEventHandler, FC, useMemo, useRef } from 'react';
+import { toast, ToastContainer } from 'react-toastify';
 import {
   Transforms,
   createEditor,
@@ -25,31 +20,25 @@ import {
   Element as SlateElement,
 } from 'slate';
 import { withHistory } from 'slate-history';
+import { Slate, Editable, useSlateStatic, withReact } from 'slate-react';
+import Toolbar from '../../../components/Toolbar';
+import { withCorrectVoidBehavior } from '../../../plugin/CorrectVoidBehaviour';
 import {
-  Slate,
-  Editable,
-  useSlateStatic,
-  withReact,
-  RenderElementProps,
-  RenderLeafProps,
-} from 'slate-react';
-import { Image } from '../../components/Image';
-import Toolbar from '../../components/Toolbar';
-import { withCorrectVoidBehavior } from '../../plugin/CorrectVoidBehaviour';
-import { insertImages, withImages } from '../../plugin/Images';
-import { withLayout } from '../../plugin/Layout';
+  insertImages,
+  uploadImages,
+  makeImagesPlugin,
+} from '../../../plugin/Images';
+import { withLayout } from '../../../plugin/Layout';
+import 'react-toastify/dist/ReactToastify.css';
+import { NoticeElement } from '../../../components/notice/NoticeElement';
+import { NoticeLeaf } from '../../../components/notice/NoticeLeaf';
 
-export type ImageElement = {
-  type: 'image';
-  url: string;
-  children: EmptyText[];
-};
+const EditorPage: NextPage<{
+  noticeId: number;
+  editorDocument: Descendant[] | null;
+}> = ({ noticeId, editorDocument }) => {
+  const withImages = makeImagesPlugin(noticeId);
 
-export type EmptyText = {
-  text: string;
-};
-
-const ImagesExample = () => {
   const editor = useMemo(
     () =>
       withCorrectVoidBehavior(
@@ -59,45 +48,15 @@ const ImagesExample = () => {
     [],
   );
 
-  const [storage, setStorage] = useState<Storage | null>(null);
-  useEffect(() => setStorage(localStorage), []);
-
-  const initialValue = useMemo(() => {
-    if (!storage) {
-      return defaultValue;
-    }
-
-    const content = storage.getItem('content');
-
-    if (content) {
-      return JSON.parse(content);
-    }
-
-    return defaultValue;
-  }, [storage]);
+  const initialValue: Descendant[] = editorDocument || defaultValue;
 
   return (
-    <div className="absolute flex justify-center min-w-full min-h-full bg-gray-100">
-      <div className="bg-white md:w-5/6 lg:w-3/4 h-fit my-8 p-4 rounded border shadow">
-        {storage ? (
-          <Slate
-            editor={editor}
-            value={initialValue}
-            onChange={(value) => {
-              const isAstChange = editor.operations.some(
-                (op) => 'set_selection' !== op.type,
-              );
-              if (isAstChange) {
-                const content = JSON.stringify(value);
+    <>
+      <div className="absolute flex justify-center min-w-full min-h-full bg-gray-100">
+        <ToastContainer />
 
-                try {
-                  storage.setItem('content', content);
-                } catch (err) {
-                  console.error(err);
-                }
-              }
-            }}
-          >
+        <div className="bg-white md:w-5/6 lg:w-3/4 h-fit my-8 p-4 rounded border shadow">
+          <Slate editor={editor} value={initialValue}>
             <Toolbar>
               <MarkButton type="bold">
                 <TextBold theme="filled" size="18" />
@@ -122,26 +81,64 @@ const ImagesExample = () => {
                 <MindmapList theme="filled" size="18" />
               </BlockButton>
 
-              <ImageButton />
+              <ImageButton noticeId={noticeId} />
 
-              <button>
-                <UploadTwo theme="filled" size="18" />
-              </button>
+              <UploadButton editor={editor} noticeId={noticeId} />
             </Toolbar>
 
             <Editable
               className="h-full w-full mt-4"
-              renderElement={(props) => <Element {...props} />}
-              renderLeaf={Leaf}
+              renderElement={(props) => (
+                <NoticeElement {...props} noticeId={noticeId} />
+              )}
+              renderLeaf={NoticeLeaf}
             />
           </Slate>
-        ) : null}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
-const ImageButton: FC = () => {
+const UploadButton: FC<{ noticeId: number; editor: Editor }> = ({
+  noticeId,
+  editor,
+}) => {
+  const handleClick = async () => {
+    const response = await fetch(`/api/editor/${noticeId}/updateNotice`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ document: editor.children }),
+    });
+
+    console.log(response);
+
+    if (response.status == 200) {
+      toast('Datos guardados', {
+        type: 'success',
+      });
+    } else if (response.status == 400) {
+      const obj = await response.json();
+      toast(obj.error, {
+        type: 'error',
+      });
+    } else if (response.status == 500) {
+      toast('Error del servidor, por favor intentalo más tarde', {
+        type: 'error',
+      });
+    }
+  };
+
+  return (
+    <button onClick={handleClick}>
+      <UploadTwo theme="filled" size="18" />
+    </button>
+  );
+};
+
+const ImageButton: FC<{ noticeId: number }> = ({ noticeId }) => {
   const editor = useSlateStatic();
   const ref = useRef<HTMLInputElement>(null);
 
@@ -155,21 +152,8 @@ const ImageButton: FC = () => {
     const files = e.target.files;
 
     if (files && files.length > 0) {
-      const promises = [];
-      for (let file of files) {
-        const [mime] = file.type.split('/');
-        if (mime != 'image') continue;
-
-        let filePromise = new Promise<string>((resolve, reject) => {
-          let reader = new FileReader();
-          reader.onload = () => resolve(reader.result as string);
-          reader.onerror = () => reject(reader.result);
-          reader.readAsDataURL(file);
-        });
-        promises.push(filePromise);
-      }
-
-      Promise.all(promises).then((urls) => insertImages(editor, urls));
+      const filenames = await uploadImages(noticeId, files);
+      insertImages(editor, filenames);
     }
   };
 
@@ -322,84 +306,6 @@ const isBlockActive = (editor: Editor, format: string) => {
   return !!match;
 };
 
-const Element = ({ attributes, children, element }: RenderElementProps) => {
-  switch (element.type) {
-    case 'image':
-      return (
-        <Image attributes={attributes} children={children} element={element} />
-      );
-    case 'list-item':
-      return <li {...attributes}>{children}</li>;
-    case 'numbered-list':
-      return (
-        <ol className="list-inside list-decimal" {...attributes}>
-          {children}
-        </ol>
-      );
-    case 'bulleted-list':
-      return (
-        <ul className="list-inside list-disc" {...attributes}>
-          {children}
-        </ul>
-      );
-    case 'title':
-      const isEmpty = (element.children.at(0)?.text?.length ?? 1) == 0;
-      console.log(isEmpty);
-      return (
-        <div className="z-10 relative pb-4">
-          <p
-            className="placeholder text-5xl whitespace-normal text-justify"
-            {...attributes}
-          >
-            {children}
-          </p>
-          {isEmpty ? (
-            <div
-              suppressContentEditableWarning={true}
-              contentEditable="false"
-              className="-z-10 text-5xl absolute top-0 left-0 select-none text-neutral-400"
-              style={{ pointerEvents: 'none' }}
-            >
-              Title...
-            </div>
-          ) : null}
-        </div>
-      );
-    case 'paragraph':
-      return (
-        // TODO fix text-justify on firefox
-        // whitespace-normal
-        <p className="text-justify" {...attributes}>
-          {children}
-        </p>
-      );
-  }
-};
-
-const Leaf = ({ attributes, children, leaf }: RenderLeafProps) => {
-  if (leaf.bold) {
-    children = <strong>{children}</strong>;
-  }
-
-  if (leaf.italic) {
-    children = <em>{children}</em>;
-  }
-
-  if (leaf.underline) {
-    children = <u>{children}</u>;
-  }
-
-  if (leaf.h1) {
-    children = <span className="text-xl">{children}</span>;
-  }
-
-  if (leaf.h2) {
-    children = <span className="text-3xl">{children}</span>;
-  }
-
-  return <span {...attributes}>{children}</span>;
-};
-
 const defaultValue: Descendant[] = [
   {
     type: 'title',
@@ -419,4 +325,47 @@ const defaultValue: Descendant[] = [
   },
 ];
 
-export default ImagesExample;
+export const getServerSideProps: GetServerSideProps = async ({
+  query,
+  req,
+}) => {
+  if (!req.cookies['connect.sid']) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: '/login',
+      },
+    };
+  }
+
+  console.log(query.noticeId);
+
+  const response = await fetch(
+    `${process.env.API_PATH}/notices/${query.noticeId}`,
+    {
+      headers: {
+        cookie: `connect.sid=${req.cookies['connect.sid']}`,
+      },
+    },
+  );
+
+  console.log(response);
+
+  if (response.ok) {
+    const { document } = await response.json();
+    return { props: { noticeId: query.noticeId, editorDocument: document } };
+  } else if (response.status == 404) {
+    return {
+      notFound: true,
+    };
+  } else {
+    return {
+      redirect: {
+        permanent: false,
+        destination: '/login',
+      },
+    };
+  }
+};
+
+export default EditorPage;
