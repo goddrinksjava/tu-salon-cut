@@ -44,7 +44,7 @@ noticesRouter.get(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const notices = await getNotices({ is_public: true });
-      res.json({ notices });
+      res.json(notices);
     } catch (err) {
       next(err);
     }

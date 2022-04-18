@@ -11,8 +11,14 @@ import AppLink from '../components/AppLink';
 import Head from 'next/head';
 import { INotice } from './admin';
 import PublicNotice from '../components/notice/PublicNotice';
+import { WorstClassrooms } from '../types/worstClassrooms';
+import BadClassroom from '../components/BadClassroom';
+import { loginAndSignupGetSSP } from '../util/loginAndSignupGetSSP';
 
-const Editor: NextPage<{ notices: INotice[] }> = ({ notices }) => {
+const Editor: NextPage<{
+  notices: INotice[];
+  worstClassrooms: WorstClassrooms;
+}> = ({ notices, worstClassrooms }) => {
   const router = useRouter();
   const [error, setError] = useState<string | undefined>(undefined);
 
@@ -139,35 +145,32 @@ const Editor: NextPage<{ notices: INotice[] }> = ({ notices }) => {
           </div>
         </div>
 
-        <div className="flex-auto hidden xl:flex pt-8 lg:pt-0 items-center w-full h-full max-h-screen px-6 mx-auto">
-          <h2 className="text-3xl md:text-5xl xl:text-6xl font-bold text-gray-700">
-            Salones
-          </h2>
+        <div className="h-full max-h-screen flex-auto hidden md:flex flex-col w-full mx-auto">
+          <div className="m-auto overflow-y-auto w-full p-6">
+            <h2 className="block mb-4 text-6xl font-bold text-gray-700">
+              Salones
+            </h2>
+
+            {
+              <div className="space-y-4 w-full">
+                {worstClassrooms.map((classroom) => {
+                  return (
+                    <BadClassroom
+                      key={classroom.fk_classroom}
+                      name={classroom.fk_classroom}
+                      nComplaints={classroom.count}
+                    />
+                  );
+                })}
+              </div>
+            }
+          </div>
         </div>
       </div>
     </>
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async ({ req }) => {
-  const response = await fetch(`${process.env.API_PATH}/notices/public/all`);
-
-  if (response.ok) {
-    const { notices } = await response.json();
-    console.log(notices);
-    return { props: { notices } };
-  } else if (response.status == 404) {
-    return {
-      notFound: true,
-    };
-  } else {
-    return {
-      redirect: {
-        permanent: false,
-        destination: '/login',
-      },
-    };
-  }
-};
+export const getServerSideProps: GetServerSideProps = loginAndSignupGetSSP;
 
 export default Editor;

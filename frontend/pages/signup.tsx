@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { NextPage } from 'next';
+import { GetServerSideProps, NextPage } from 'next';
 import AppTextInput from '../components/AppTextInput';
 import { Form, Formik } from 'formik';
 import AppButton from '../components/AppButton';
@@ -10,8 +10,16 @@ import Head from 'next/head';
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { WorstClassrooms } from '../types/worstClassrooms';
+import { loginAndSignupGetSSP } from '../util/loginAndSignupGetSSP';
+import { INotice } from './admin';
+import BadClassroom from '../components/BadClassroom';
+import PublicNotice from '../components/notice/PublicNotice';
 
-const Editor: NextPage = () => {
+const Editor: NextPage<{
+  notices: INotice[];
+  worstClassrooms: WorstClassrooms;
+}> = ({ notices, worstClassrooms }) => {
   const router = useRouter();
 
   return (
@@ -23,10 +31,24 @@ const Editor: NextPage = () => {
       <ToastContainer />
 
       <div className="bg-white flex justify-center h-screen md:divide-x">
-        <div className="flex-auto hidden md:flex pt-8 lg:pt-0 items-center w-full px-6 mx-auto">
-          <h2 className="text-3xl md:text-5xl xl:text-6xl font-bold text-gray-700">
-            Noticias
-          </h2>
+        <div className="h-full max-h-screen flex-auto hidden md:flex flex-col w-full mx-auto">
+          <div className="m-auto overflow-y-auto w-full p-6">
+            <h2 className="block mb-4 text-6xl font-bold text-gray-700">
+              Noticias
+            </h2>
+
+            {
+              <div className="space-y-4 w-full">
+                {notices.map((notice) => {
+                  return (
+                    <div className="p-3 rounded border shadow" key={notice.id}>
+                      <PublicNotice notice={notice} />
+                    </div>
+                  );
+                })}
+              </div>
+            }
+          </div>
         </div>
 
         <div className="flex pt-8 lg:pt-0 md:items-center w-full px-6 mx-auto">
@@ -127,13 +149,32 @@ const Editor: NextPage = () => {
           </div>
         </div>
 
-        <div className="flex-auto hidden xl:flex pt-8 lg:pt-0 items-center w-full px-6 mx-auto">
-          <h2 className="text-3xl md:text-5xl xl:text-6xl font-bold text-gray-700">
-            Salones
-          </h2>
+        <div className="h-full max-h-screen flex-auto hidden md:flex flex-col w-full mx-auto">
+          <div className="m-auto overflow-y-auto w-full p-6">
+            <h2 className="block mb-4 text-6xl font-bold text-gray-700">
+              Salones
+            </h2>
+
+            {
+              <div className="space-y-4 w-full">
+                {worstClassrooms.map((classroom) => {
+                  return (
+                    <BadClassroom
+                      key={classroom.fk_classroom}
+                      name={classroom.fk_classroom}
+                      nComplaints={classroom.count}
+                    />
+                  );
+                })}
+              </div>
+            }
+          </div>
         </div>
       </div>
     </>
   );
 };
+
+export const getServerSideProps: GetServerSideProps = loginAndSignupGetSSP;
+
 export default Editor;
