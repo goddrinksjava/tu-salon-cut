@@ -61,6 +61,7 @@ services:
     command: sh -c "yarn install && yarn start:dev"
     restart: always
     environment:
+      - NODE_ENV=development
       - DB_PASSWORD=postgres
       - DB_USER=user_tu_salon_cut
       - DB_DATABASE=tu_salon_cut
@@ -69,6 +70,8 @@ services:
       - REDIS_HOST=cache
       - SESSION_SECRET_1=newSecret
       - SESSION_SECRET_2=oldSecret
+      - SMTP_HOST=mailhog
+      - SMTP_PORT=1025
     volumes:
       - ./backend:/home/node/app/backend
     ports:

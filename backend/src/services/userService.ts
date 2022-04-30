@@ -4,9 +4,9 @@ import { DatabaseError } from 'pg';
 import db from '../knex';
 import transporter from '../transporter';
 import redis from '../redis';
-import { v4 as uuidv4 } from 'uuid';
+import { nanoid } from 'nanoid';
 
-const createUser = async (
+export const createUser = async (
   email: string,
   plain_password: string,
 ): Promise<User | 'EmailTaken'> => {
@@ -28,6 +28,7 @@ const createUser = async (
 
     return user;
   } catch (err) {
+    console.log(err);
     if (err instanceof DatabaseError && err.code == '23505') {
       return 'EmailTaken';
     }
@@ -35,23 +36,28 @@ const createUser = async (
   }
 };
 
-const getUserByEmail = async (email: string): Promise<User | null> => {
+export const getUserByEmail = async (email: string): Promise<User | null> => {
   return db('users').select().where({ email }).first();
 };
 
-const sendConfirmationEmail = async (userId: number, userEmail: string) => {
-  const uuid = uuidv4();
+export const sendConfirmationEmail = async (
+  userId: number,
+  userEmail: string,
+) => {
+  const uuid = nanoid();
   redis.set(uuid, userId);
 
   let info = await transporter.sendMail({
-    from: 'confirmation@tu_salon_cut.com',
+    from: '"Tu Salón CUT" <notification@tusaloncut.udg.mx>',
     to: userEmail,
-    subject: 'Tu Salón CUT',
-    text: `Ingresa al siguiente link para activar tu cuenta: http://localhost:3000/confirm/${uuid}`,
+    subject: 'Verificación de correo electrónico',
+    text: `Ingresa al siguiente link para verificar tu cuenta: http://localhost:3000/verifica/${uuid}`,
   });
+
+  console.log(info);
 };
 
-const confirmEmail = async (uuid: string) => {
+export const verifyEmail = async (uuid: string) => {
   //TODO handle exceptions
 
   const userId = await redis.get(uuid);
@@ -63,12 +69,10 @@ const confirmEmail = async (uuid: string) => {
   redis.del(uuid);
 };
 
-const isEmailValidated = async (userId: number): Promise<boolean> => {
+export const isEmailValidated = async (userId: number): Promise<boolean> => {
   const email_validated_at = await db('users')
     .select('email_validated_at')
     .where({ id: userId });
 
   return email_validated_at == null;
 };
-
-export { createUser, getUserByEmail, isEmailValidated };

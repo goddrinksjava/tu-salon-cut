@@ -5,12 +5,26 @@ import {
   createUser,
   getUserByEmail,
   isEmailValidated,
+  verifyEmail,
 } from '../services/userService';
 import { validateBody } from '../middleware/validateMiddleware';
 import { credentialsSchema } from '../schema/credentials';
 import redis from '../redis';
 
 const authRouter: Router = express.Router();
+
+authRouter.get(
+  '/verifyEmail/:uuid',
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { uuid } = req.params;
+    try {
+      await verifyEmail(uuid);
+      res.sendStatus(200);
+    } catch (error) {
+      next(error);
+    }
+  },
+);
 
 authRouter.get(
   '/logout',
@@ -45,6 +59,7 @@ authRouter.post(
           email: user.email,
           emailValidated: await isEmailValidated(user.id),
           isAdmin: user.is_admin,
+          isVerified: user.email_validated_at !== null,
         };
 
         req.session.save(function (err) {
@@ -81,9 +96,8 @@ authRouter.post(
         email: result.email,
         emailValidated: false,
         isAdmin: result.is_admin,
+        isVerified: false,
       };
-
-      redis.lpush(`userSessions:${result.id}`, req.sessionID);
 
       res.sendStatus(200);
     } catch (err) {

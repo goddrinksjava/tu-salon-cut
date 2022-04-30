@@ -8,6 +8,7 @@ declare module 'express-session' {
           email: string;
           emailValidated: boolean;
           isAdmin: boolean;
+          isVerified: boolean;
         }
       | undefined;
   }

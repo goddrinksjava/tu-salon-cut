@@ -1,6 +1,11 @@
 import db from '../knex';
 
-const getWorstClassrooms = async (n: number = 5) => {
+export const getClassrooms = async () => {
+  const result = await db('classrooms').pluck('id');
+  return result;
+};
+
+export const getWorstClassrooms = async (n: number = 5) => {
   const result = await db('classroom_complaints')
     .select('fk_classroom')
     .count('fk_classroom')
@@ -10,5 +15,3 @@ const getWorstClassrooms = async (n: number = 5) => {
 
   return result;
 };
-
-export { getWorstClassrooms };

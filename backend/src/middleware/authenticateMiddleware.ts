@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
+import { isEmailValidated } from '../services/userService';
 
 //TODO cache returned function
 const authenticate =
@@ -8,11 +9,24 @@ const authenticate =
     console.log(req.sessionID);
 
     if (!user) {
-      return res.sendStatus(401);
+      res.status(401);
+      return res.json({ error: 'unauthenticated' });
+    }
+
+    if (!user.isVerified) {
+      const isVerified = isEmailValidated(user.id);
+
+      if (!isVerified) {
+        res.status(403);
+        return res.json({ error: 'emailNotVerified' });
+      }
+
+      user.isVerified = true;
     }
 
     if (mustBeAdmin && !user.isAdmin) {
-      return res.sendStatus(403);
+      res.status(403);
+      return res.json({ error: 'forbidden' });
     }
 
     req.user = user;

@@ -1,8 +1,23 @@
 import * as express from 'express';
 import { NextFunction, Request, Response, Router } from 'express';
-import { getWorstClassrooms } from '../services/classroomsService';
+import {
+  getClassrooms,
+  getWorstClassrooms,
+} from '../services/classroomsService';
 
 const classroomsRouter: Router = express.Router();
+
+classroomsRouter.get(
+  '/',
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const classrooms = await getClassrooms();
+      res.json(classrooms);
+    } catch (err) {
+      next(err);
+    }
+  },
+);
 
 classroomsRouter.get(
   '/worst',
