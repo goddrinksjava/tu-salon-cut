@@ -1,18 +1,33 @@
-import type { GetServerSideProps, NextPage } from 'next';
-import Head from 'next/head';
-import Image from 'next/image';
+import type { GetStaticProps, NextPage } from 'next';
 import SearchBar from '../components/SearchBar';
-import styles from '../styles/Home.module.css';
+import buildings from '../json/buildings.json';
 
 const Home: NextPage<{ classrooms: string[] }> = ({ classrooms }) => {
   return (
-    <div className="p-2">
-      <SearchBar list={classrooms} />
-    </div>
+    <>
+      <div className="p-2">
+        <SearchBar list={classrooms} />
+      </div>
+      <div className="relative">
+        <img src="/map.jpg" alt="mapa" />
+        {buildings.map((b) => (
+          <button
+            className="absolute bg-red-700 opacity-40"
+            style={{
+              left: `${b.x}%`,
+              top: `${b.y}%`,
+              width: `${b.w}%`,
+              height: `${b.h}%`,
+            }}
+            title={`Edificio ${b.building}`}
+          />
+        ))}
+      </div>
+    </>
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async ({ query }) => {
+export const getStaticProps: GetStaticProps = async () => {
   const response = await fetch(`${process.env.API_PATH}/classrooms`);
 
   if (response.ok) {

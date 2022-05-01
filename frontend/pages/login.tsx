@@ -6,7 +6,6 @@ import AppButton from '../components/AppButton';
 import { loginSchema } from '../schema/login';
 import AppError from '../components/AppError';
 import { useRouter } from 'next/router';
-import Link from 'next/link';
 import AppLink from '../components/AppLink';
 import Head from 'next/head';
 import { INotice } from './admin';
@@ -145,7 +144,7 @@ const Editor: NextPage<{
           </div>
         </div>
 
-        <div className="h-full max-h-screen flex-auto hidden md:flex flex-col w-full mx-auto">
+        <div className="h-full max-h-screen flex-auto hidden xl:flex flex-col w-full mx-auto">
           <div className="m-auto overflow-y-auto w-full p-6">
             <h2 className="block mb-4 text-6xl font-bold text-gray-700">
               Salones

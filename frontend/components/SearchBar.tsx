@@ -1,7 +1,6 @@
 import { Search } from '@icon-park/react';
-import Fuse from 'fuse.js';
 import fuzzysort from 'fuzzysort';
-import React, { createRef, FC, useMemo, useRef, useState } from 'react';
+import React, { FC, useMemo, useRef, useState } from 'react';
 
 interface ISearchBarProps {
   list: string[];
@@ -73,22 +72,20 @@ const SearchBar: FC<ISearchBarProps> = ({ list }) => {
 
       <div
         className={`bg-white rounded-md border ${
-          hidden ? 'hidden' : 'flex flex-row items-center'
+          hidden || results.length == 0
+            ? 'hidden'
+            : 'flex flex-row items-center'
         } space-x-2 p-2 mt-2`}
       >
-        {results.length > 0 ? (
-          results.map((match) => (
-            <a
-              href={`/classrooms/${match.target}`}
-              key={match.target}
-              className="hover:underline"
-            >
-              {match.target}
-            </a>
-          ))
-        ) : (
-          <p>No se ha encontrado ningún salón</p>
-        )}
+        {results.map((match) => (
+          <a
+            href={`/classrooms/${match.target}`}
+            key={match.target}
+            className="hover:underline"
+          >
+            {match.target}
+          </a>
+        ))}
       </div>
     </div>
   );
