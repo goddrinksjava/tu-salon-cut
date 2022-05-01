@@ -1,15 +1,19 @@
 import type { GetStaticProps, NextPage } from 'next';
+import { useState } from 'react';
+import Dialog from '../components/ClassroomPicker';
 import SearchBar from '../components/SearchBar';
 import buildings from '../json/buildings.json';
 
 const Home: NextPage<{ classrooms: string[] }> = ({ classrooms }) => {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
   return (
-    <>
+    <div className="absolute">
       <div className="p-2">
         <SearchBar list={classrooms} />
       </div>
       <div className="relative">
-        <img src="/map.jpg" alt="mapa" />
+        <img src="/map.jpg" alt="mapa" className="" />
         {buildings.map((b) => (
           <button
             className="absolute bg-red-700 opacity-40"
@@ -20,10 +24,14 @@ const Home: NextPage<{ classrooms: string[] }> = ({ classrooms }) => {
               height: `${b.h}%`,
             }}
             title={`Edificio ${b.building}`}
+            onClick={() => setIsDialogOpen(true)}
           />
         ))}
       </div>
-    </>
+      <Dialog isOpen={isDialogOpen} setIsOpen={setIsDialogOpen}>
+        <div className="w-32 h-32 bg-neutral-900" />
+      </Dialog>
+    </div>
   );
 };
 

@@ -125,7 +125,7 @@ const Editor: NextPage<{
 
                     <div className="mt-6">
                       <AppButton
-                        color="cyan"
+                        color="green"
                         type="submit"
                         disabled={isSubmitting}
                       >
@@ -139,7 +139,7 @@ const Editor: NextPage<{
                   </div>
 
                   <div>
-                    <AppLink href="/login" color="green">
+                    <AppLink href="/login" color="cyan">
                       Iniciar Sesión
                     </AppLink>
                   </div>
