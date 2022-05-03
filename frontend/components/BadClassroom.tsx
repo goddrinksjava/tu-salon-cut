@@ -1,4 +1,4 @@
-import { DisappointedFace } from '@icon-park/react';
+import { BadTwo, DisappointedFace } from '@icon-park/react';
 import Link from 'next/link';
 import React, { FC } from 'react';
 
@@ -16,12 +16,12 @@ const BadClassroom: FC<IBadClassroomProps> = ({
       <a>
         <div
           role="alert"
-          className="flex justify-between mt-4 border border-gray-400 rounded bg-gray-100 px-4 py-3 text-gray-700"
+          className="flex justify-between mt-4 rounded bg-slate-50 px-4 py-3 text-slate-700 transition ease-in-out delay-100 duration-300 hover:-translate-y-1 hover:scale-105"
         >
-          <p>{name}</p>
+          <p className="font-medium">{name}</p>
 
           <div className="flex space-x-2">
-            <DisappointedFace theme="outline" size="24" fill="#333" />
+            <BadTwo theme="filled" size="24" fill="#333" />
             <p>x{complaints}</p>
           </div>
         </div>

@@ -44,13 +44,30 @@ const ClassroomProblems: NextPage<IClassroomProblemsProps> = ({
   const router = useRouter();
   const { id } = router.query;
 
-  const [saving, setSaving] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [commentState, setCommentState] = useState<string>(comment ?? '');
 
   const stateArray = complaints.map(({ checked }) => useState(checked));
 
+  const reset = async () => {
+    setSubmitting(true);
+    const resetResponse = await fetch(`/api/classrooms/${id}/reset`, {
+      method: 'POST',
+    });
+
+    if (resetResponse.ok) {
+      toast('El salón ha sido reiniciado', {
+        type: 'success',
+      });
+    } else {
+      toast('Error al reiniciar el salón', {
+        type: 'error',
+      });
+    }
+  };
+
   const save = async () => {
-    setSaving(true);
+    setSubmitting(true);
 
     let submitData: { classroomProblemsId: number[] } = {
       classroomProblemsId: [],
@@ -64,7 +81,7 @@ const ClassroomProblems: NextPage<IClassroomProblemsProps> = ({
 
     console.log(submitData);
 
-    const complaintsResponse = await fetch('/api/complaints/' + id, {
+    const complaintsResponse = await fetch(`/api/complaints/${id}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -72,7 +89,7 @@ const ClassroomProblems: NextPage<IClassroomProblemsProps> = ({
       body: JSON.stringify(submitData),
     });
 
-    const commentResponse = await fetch('/api/comments/' + id, {
+    const commentResponse = await fetch(`/api/comments/${id}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -98,14 +115,14 @@ const ClassroomProblems: NextPage<IClassroomProblemsProps> = ({
       }
     }
 
-    setSaving(false);
+    setSubmitting(false);
   };
 
   return (
     <div className="w-3/4 mx-auto">
       <ToastContainer />
       <h1 className="text-3xl md:text-5xl xl:text-6xl font-bold text-gray-700 text-center pt-2">
-        Edificio <span className="text-green-500">{id}</span>
+        Edificio <span className="text-emerald-500">{id}</span>
       </h1>
 
       <div className="bg-white flex justify-center">
@@ -168,6 +185,7 @@ const ClassroomProblems: NextPage<IClassroomProblemsProps> = ({
                   count={parseInt(count)}
                   checked={stateArray[i][0]}
                   setChecked={stateArray[i][1]}
+                  disabled={userType != 'user'}
                 />
               );
             })}
@@ -175,11 +193,25 @@ const ClassroomProblems: NextPage<IClassroomProblemsProps> = ({
         </div>
       </div>
 
-      <div className="mt-4 pt-8 px-6 mx-auto">
-        <AppButton color="green" disabled={saving} onclick={save}>
-          Guardar
-        </AppButton>
-      </div>
+      {
+        {
+          guest: null,
+          user: (
+            <div className="mt-4 pt-8 px-6 mx-auto">
+              <AppButton color="emerald" disabled={submitting} onclick={save}>
+                Guardar
+              </AppButton>
+            </div>
+          ),
+          admin: (
+            <div className="mt-4 pt-8 px-6 mx-auto">
+              <AppButton color="amber" disabled={submitting} onclick={reset}>
+                Reiniciar salón
+              </AppButton>
+            </div>
+          ),
+        }[userType]
+      }
     </div>
   );
 };

@@ -123,7 +123,7 @@ const Editor: NextPage<{
                     </div>
                     <div className="mt-6">
                       <AppButton
-                        color="green"
+                        color="emerald"
                         type="submit"
                         disabled={isSubmitting}
                       >

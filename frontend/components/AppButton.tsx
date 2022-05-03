@@ -1,15 +1,31 @@
 import React, { FC } from 'react';
 
-// !! Don't remove - Required by tailwind because the use of dynamic css !!
-// bg-cyan-600 hover:bg-cyan-500 focus:bg-cyan-500 focus:ring-cyan-400
-// bg-green-600 hover:bg-green-500 focus:bg-green-500 focus:ring-green-400
+export type ButtonColor = 'cyan' | 'emerald' | 'amber';
 
 interface IAppButtonProps {
   type?: 'submit' | 'reset' | 'button';
-  color: 'cyan' | 'green';
+  color: ButtonColor;
   disabled?: boolean;
   onclick?: React.MouseEventHandler<HTMLButtonElement>;
 }
+
+const commonClasses =
+  'w-full px-4 py-2 tracking-wide text-white rounded-md transform focus:outline-none ' +
+  'transition ease-in-out delay-100 duration-300 hover:-translate-y-1 hover:scale-105 ';
+
+const dynamicClasses = {
+  cyan: 'bg-cyan-500 hover:bg-sky-500',
+  emerald: 'bg-emerald-500 hover:bg-green-500',
+  amber: 'bg-amber-500 hover:bg-red-500',
+};
+
+export const buttonClass = (color: ButtonColor) => {
+  return (
+    'font-medium w-full px-4 py-2 tracking-wide text-white rounded-md transform focus:outline-none ' +
+    'transition ease-in-out delay-100 duration-300 hover:-translate-y-1 hover:scale-105 ' +
+    dynamicClasses[color]
+  );
+};
 
 const AppButton: FC<IAppButtonProps> = ({
   color,
@@ -23,7 +39,7 @@ const AppButton: FC<IAppButtonProps> = ({
       onClick={onclick}
       disabled={disabled}
       type={type}
-      className={`w-full px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-${color}-600 rounded-md hover:bg-${color}-500 focus:outline-none focus:bg-${color}-500 focus:ring focus:ring-${color}-400 focus:ring-opacity-50`}
+      className={buttonClass(color)}
     >
       {children}
     </button>

@@ -1,6 +1,7 @@
 import React, { FC, useEffect, useRef, useState } from 'react';
 
 interface IClassroomProblemProps {
+  disabled?: boolean;
   label: string;
   count: number;
   checked: boolean;
@@ -8,6 +9,7 @@ interface IClassroomProblemProps {
 }
 
 const ClassroomProblem: FC<IClassroomProblemProps> = ({
+  disabled = false,
   label,
   count,
   checked,
@@ -15,12 +17,8 @@ const ClassroomProblem: FC<IClassroomProblemProps> = ({
 }) => {
   const uiCount = useRef(count - (checked ? 1 : 0));
 
-  const cl = (checked: boolean) => {
-    if (checked) {
-      return 'cursor-pointer flex justify-between border border-rose-400 rounded bg-rose-100 px-4 py-3 text-rose-700';
-    }
-
-    return 'cursor-pointer flex justify-between border border-slate-50 rounded bg-slate-50 px-4 py-3 text-slate-700';
+  const dynamicClass = (checked: boolean) => {
+    return checked ? 'bg-rose-100 text-rose-700' : 'bg-slate-50 text-slate-700';
   };
 
   const toggle = () => {
@@ -28,7 +26,15 @@ const ClassroomProblem: FC<IClassroomProblemProps> = ({
   };
 
   return (
-    <div role="alert" className={cl(checked)} onClick={toggle}>
+    <div
+      role="alert"
+      className={
+        (disabled ? '' : 'cursor-pointer ') +
+        'flex justify-between px-4 py-3 rounded ' +
+        dynamicClass(checked)
+      }
+      onClick={disabled ? undefined : toggle}
+    >
       <p className="select-none">{label}</p>
       <p className="select-none">{uiCount.current + (checked ? 1 : 0)}</p>
     </div>

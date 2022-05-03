@@ -55,7 +55,10 @@ const Editor: NextPage<{
           <div className="flex-1">
             <div>
               <h2 className="text-3xl md:text-5xl xl:text-6xl font-bold text-gray-700">
-                Tu Salón CUT
+                Tu Salón{' '}
+                <span className="font-black text-transparent bg-clip-text bg-gradient-to-r from-green-500 to-cyan-500">
+                  CUT
+                </span>
               </h2>
             </div>
 
@@ -125,7 +128,7 @@ const Editor: NextPage<{
 
                     <div className="mt-6">
                       <AppButton
-                        color="green"
+                        color="emerald"
                         type="submit"
                         disabled={isSubmitting}
                       >

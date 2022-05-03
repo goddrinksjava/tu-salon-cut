@@ -48,12 +48,12 @@ const ClassroomPicker: FC<ClassroomPicker> = ({
       as="div"
       className={`fixed inset-0 z-10 flex items-center justify-center overflow-y-auto bg-slate-50`}
     >
-      <div className="flex flex-col bg-slate-100 w-96 py-8 px-4 text-center">
+      <div className="flex flex-col bg-slate-100 rounded-md w-96 py-8 px-4 text-center">
         <Dialog.Overlay />
 
         <h2></h2>
 
-        <Dialog.Title className="text-green-500 text-5xl pb-8">
+        <Dialog.Title className="text-emerald-500 text-5xl pb-8">
           Edificio {building}
         </Dialog.Title>
 
