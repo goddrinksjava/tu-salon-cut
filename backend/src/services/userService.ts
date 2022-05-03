@@ -70,9 +70,10 @@ export const verifyEmail = async (uuid: string) => {
 };
 
 export const isEmailValidated = async (userId: number): Promise<boolean> => {
-  const email_validated_at = await db('users')
+  const { email_validated_at } = await db('users')
     .select('email_validated_at')
-    .where({ id: userId });
+    .where({ id: userId })
+    .first();
 
-  return email_validated_at == null;
+  return email_validated_at !== null;
 };

@@ -4,11 +4,9 @@ module.exports = {
     "./components/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {
-      transitionProperty: {
-        'height': 'height'
-      }
-    },
+    fontFamily: {
+      sans: ['Inter', 'sans-serif']
+    }
   },
   plugins: [],
 }

@@ -1,14 +1,15 @@
 import type { GetStaticProps, NextPage } from 'next';
 import { useState } from 'react';
-import Dialog from '../components/ClassroomPicker';
+import ClassroomPicker from '../components/ClassroomPicker';
 import SearchBar from '../components/SearchBar';
 import buildings from '../json/buildings.json';
 
 const Home: NextPage<{ classrooms: string[] }> = ({ classrooms }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [building, setBuilding] = useState('');
 
   return (
-    <div className="absolute">
+    <div className="absolute max-h-full max-w-full overflow-y-scroll">
       <div className="p-2">
         <SearchBar list={classrooms} />
       </div>
@@ -16,6 +17,7 @@ const Home: NextPage<{ classrooms: string[] }> = ({ classrooms }) => {
         <img src="/map.jpg" alt="mapa" className="" />
         {buildings.map((b) => (
           <button
+            key={b.building}
             className="absolute bg-red-700 opacity-40"
             style={{
               left: `${b.x}%`,
@@ -24,13 +26,19 @@ const Home: NextPage<{ classrooms: string[] }> = ({ classrooms }) => {
               height: `${b.h}%`,
             }}
             title={`Edificio ${b.building}`}
-            onClick={() => setIsDialogOpen(true)}
+            onClick={() => {
+              setBuilding(b.building);
+              setIsDialogOpen(true);
+            }}
           />
         ))}
       </div>
-      <Dialog isOpen={isDialogOpen} setIsOpen={setIsDialogOpen}>
-        <div className="w-32 h-32 bg-neutral-900" />
-      </Dialog>
+      <ClassroomPicker
+        isOpen={isDialogOpen}
+        setIsOpen={setIsDialogOpen}
+        building={building}
+        classrooms={classrooms}
+      />
     </div>
   );
 };

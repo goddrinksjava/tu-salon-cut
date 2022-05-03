@@ -6,7 +6,6 @@ const authenticate =
   ({ mustBeAdmin } = { mustBeAdmin: false }) =>
   async (req: Request, res: Response, next: NextFunction) => {
     const user = req.session.user;
-    console.log(req.sessionID);
 
     if (!user) {
       res.status(401);
@@ -14,7 +13,7 @@ const authenticate =
     }
 
     if (!user.isVerified) {
-      const isVerified = isEmailValidated(user.id);
+      const isVerified = await isEmailValidated(user.id);
 
       if (!isVerified) {
         res.status(403);

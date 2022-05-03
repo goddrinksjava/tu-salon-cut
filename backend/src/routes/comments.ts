@@ -22,7 +22,7 @@ commentsRouter.get(
         (comment: any) =>
           (comment.updated_at = comment.updated_at.toLocaleDateString('es-MX')),
       );
-      res.json({ comments });
+      res.json(comments);
     } catch (err) {
       next(err);
     }
@@ -70,7 +70,7 @@ commentsRouter.get(
         res.sendStatus(404);
       }
 
-      res.json({ comment });
+      res.json(comment ?? '');
     } catch (err) {
       next(err);
     }

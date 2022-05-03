@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { UserType } from '../../types/userTypes';
 
 interface IClassroomComplaints {
   id: number;
@@ -14,10 +15,32 @@ interface IClassroomComplaints {
   checked: boolean;
 }
 
-const ClassroomProblems: NextPage<{
-  complaints: IClassroomComplaints[];
-  comment: string | null;
-}> = ({ complaints, comment }) => {
+type IClassroomProblemsProps =
+  | {
+      userType: 'guest';
+      complaints: IClassroomComplaints[];
+      comment: undefined;
+      comments: undefined;
+    }
+  | {
+      userType: 'user';
+      complaints: IClassroomComplaints[];
+      comment: string;
+      comments: undefined;
+    }
+  | {
+      userType: 'admin';
+      complaints: IClassroomComplaints[];
+      comment: undefined;
+      comments: { comment: string; updated_at: string; email: string }[];
+    };
+
+const ClassroomProblems: NextPage<IClassroomProblemsProps> = ({
+  complaints,
+  comment,
+  comments,
+  userType,
+}) => {
   const router = useRouter();
   const { id } = router.query;
 
@@ -79,45 +102,85 @@ const ClassroomProblems: NextPage<{
   };
 
   return (
-    <>
+    <div className="w-3/4 mx-auto">
       <ToastContainer />
-      <h1 className="text-5xl">{id}</h1>
+      <h1 className="text-3xl md:text-5xl xl:text-6xl font-bold text-gray-700 text-center pt-2">
+        Edificio <span className="text-green-500">{id}</span>
+      </h1>
+
       <div className="bg-white flex justify-center">
-        <div className="flex-auto flex flex-col pt-8 px-6 mx-auto w-5/12">
-          <label htmlFor="comment" className="text-gray-600 pb-4">
-            Comentario
-          </label>
+        {
+          {
+            guest: null,
+            user: (
+              <div className="flex-auto flex flex-col pt-8 px-6 mx-auto w-1/2">
+                <label
+                  htmlFor="comment"
+                  className="font-medium text-xl text-gray-700 pb-4 text-center"
+                >
+                  Comentario
+                </label>
 
-          <textarea
-            name="comment"
-            value={commentState ?? ''}
-            onChange={(e) => setCommentState(e.target.value)}
-            rows={5}
-            className="block resize-none w-full h-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-md focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40"
-          />
-        </div>
+                <textarea
+                  name="comment"
+                  value={commentState ?? ''}
+                  onChange={(e) => setCommentState(e.target.value)}
+                  rows={5}
+                  className="block resize-none w-full h-full px-4 py-2 text-slate-700 placeholder-slate-400 bg-white border border-slate-200 rounded-md focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40"
+                />
+              </div>
+            ),
+            admin: (
+              <div className="flex-auto flex flex-col pt-8 px-6 mx-auto w-1/2">
+                <p className="font-medium text-xl text-gray-700 pb-4 text-center">
+                  Comentarios
+                </p>
+                {comments?.map((v, i) => (
+                  <div key={i} className="bg-slate-50 rounded-md p-2">
+                    <div className="flex justify-between mb-2">
+                      <p className="text-slate-700 font-medium">
+                        {v.email} dice:
+                      </p>
+                      <p className="text-slate-500">{v.updated_at}</p>
+                    </div>
+                    <p className="text-slate-700">{v.comment}</p>
+                  </div>
+                ))}
+              </div>
+            ),
+          }[userType]
+        }
 
-        <div className="pt-8 px-6 mx-auto w-7/12">
-          {complaints.map(({ id, label, count, checked }, i) => {
-            return (
-              <ClassroomProblem
-                key={id}
-                label={label}
-                count={parseInt(count)}
-                checked={stateArray[i][0]}
-                setChecked={stateArray[i][1]}
-              />
-            );
-          })}
+        <div
+          className={`pt-8 px-6 mx-auto ${
+            userType == 'guest' ? 'w-full' : 'w-1/2'
+          }`}
+        >
+          <p className="font-medium text-xl text-gray-700 pb-4 text-center">
+            Problemas
+          </p>
+          <div className="flex flex-col space-y-2">
+            {complaints.map(({ id, label, count, checked }, i) => {
+              return (
+                <ClassroomProblem
+                  key={id}
+                  label={label}
+                  count={parseInt(count)}
+                  checked={stateArray[i][0]}
+                  setChecked={stateArray[i][1]}
+                />
+              );
+            })}
+          </div>
         </div>
       </div>
 
       <div className="mt-4 pt-8 px-6 mx-auto">
-        <AppButton color="cyan" disabled={saving} onclick={save}>
+        <AppButton color="green" disabled={saving} onclick={save}>
           Guardar
         </AppButton>
       </div>
-    </>
+    </div>
   );
 };
 
@@ -125,17 +188,6 @@ export const getServerSideProps: GetServerSideProps = async ({
   query,
   req,
 }) => {
-  if (!req.cookies['connect.sid']) {
-    return {
-      redirect: {
-        permanent: false,
-        destination: '/login',
-      },
-    };
-  }
-
-  console.log(query.id);
-
   const complaintsPromise = fetch(
     `${process.env.API_PATH}/complaints/${query.id}`,
     {
@@ -145,38 +197,98 @@ export const getServerSideProps: GetServerSideProps = async ({
     },
   );
 
-  const commentPromise = fetch(`${process.env.API_PATH}/comments/${query.id}`, {
+  const userTypePromise = fetch(`${process.env.API_PATH}/auth/userType`, {
     headers: {
       cookie: `connect.sid=${req.cookies['connect.sid']}`,
     },
   });
 
-  const [complaintsResponse, commentResponse] = await Promise.all([
+  const [complaintsResponse, userTypeResponse] = await Promise.all([
     complaintsPromise,
-    commentPromise,
+    userTypePromise,
   ]);
 
-  if (complaintsResponse.ok && commentResponse.ok) {
-    const complaints = await complaintsResponse.json();
-    const { comment } = await commentResponse.json();
+  if (!(complaintsResponse.ok && userTypeResponse.ok)) {
+    if (complaintsResponse.status == 404) {
+      return {
+        notFound: true,
+      };
+    } else {
+      return {
+        redirect: {
+          permanent: false,
+          destination: '/500',
+        },
+      };
+    }
+  }
 
-    return {
-      props: {
-        complaints,
-        comment,
-      },
-    };
-  } else if (complaintsResponse.status == 404) {
-    return {
-      notFound: true,
-    };
-  } else {
-    return {
-      redirect: {
-        permanent: false,
-        destination: '/login',
-      },
-    };
+  const complaints = await complaintsResponse.json();
+  const userType: UserType = await userTypeResponse.json();
+
+  console.log('usertype', userType);
+
+  switch (userType) {
+    case 'guest':
+      return {
+        props: {
+          userType,
+          complaints,
+        },
+      };
+    case 'user':
+      const commentResponse = await fetch(
+        `${process.env.API_PATH}/comments/${query.id}`,
+        {
+          headers: {
+            cookie: `connect.sid=${req.cookies['connect.sid']}`,
+          },
+        },
+      );
+
+      if (!commentResponse.ok) {
+        return {
+          redirect: {
+            permanent: false,
+            destination: '/500',
+          },
+        };
+      }
+      const comment = await commentResponse.json();
+      return {
+        props: {
+          userType,
+          complaints,
+          comment,
+        },
+      };
+    case 'admin':
+      const commentsResponse = await fetch(
+        `${process.env.API_PATH}/comments/all/${query.id}`,
+        {
+          headers: {
+            cookie: `connect.sid=${req.cookies['connect.sid']}`,
+          },
+        },
+      );
+
+      if (!commentsResponse.ok) {
+        return {
+          redirect: {
+            permanent: false,
+            destination: '/500',
+          },
+        };
+      }
+
+      const comments = await commentsResponse.json();
+      return {
+        props: {
+          userType,
+          complaints,
+          comments,
+        },
+      };
   }
 };
 

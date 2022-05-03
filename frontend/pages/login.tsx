@@ -118,7 +118,7 @@ const Editor: NextPage<{
                       <AppTextInput
                         name="password"
                         type="password"
-                        placeholder="Tu Contraseña"
+                        placeholder="Tu contraseña"
                       />
                     </div>
                     <div className="mt-6">

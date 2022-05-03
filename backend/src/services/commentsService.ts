@@ -29,7 +29,7 @@ const getComment = async (
     .pluck('comment')
     .where({ fk_user: userId, fk_classroom: classroomId });
 
-  return rows.at(0) || null;
+  return rows.at(0) ?? null;
 };
 
 interface IClassroomComments {

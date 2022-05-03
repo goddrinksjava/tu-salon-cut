@@ -107,10 +107,23 @@ authRouter.post(
 );
 
 authRouter.get(
-  '/isAdmin',
+  '/userType',
   async (req: Request, res: Response, next: NextFunction) => {
-    const user = req.session.user;
-    return user && user.isAdmin;
+    try {
+      const user = req.session.user;
+
+      if (user === undefined) {
+        return res.json('guest');
+      }
+
+      if (!user.isAdmin) {
+        return res.json('user');
+      }
+
+      res.json('admin');
+    } catch (error) {
+      next(error);
+    }
   },
 );
 

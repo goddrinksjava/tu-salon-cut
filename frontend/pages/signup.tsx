@@ -109,7 +109,7 @@ const Editor: NextPage<{
                         name="password"
                         type="password"
                         label="Contraseña"
-                        placeholder="Tu Contraseña"
+                        placeholder="Tu contraseña"
                       />
                     </div>
 
@@ -119,7 +119,7 @@ const Editor: NextPage<{
                         name="passwordConfirmation"
                         type="password"
                         label="Confirma tu contraseña"
-                        placeholder="Tu Contraseña"
+                        placeholder="Tu contraseña"
                       />
                     </div>
 

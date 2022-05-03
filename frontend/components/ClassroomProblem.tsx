@@ -17,10 +17,10 @@ const ClassroomProblem: FC<IClassroomProblemProps> = ({
 
   const cl = (checked: boolean) => {
     if (checked) {
-      return 'cursor-pointer flex justify-between mt-4 border border-rose-400 rounded bg-rose-100 px-4 py-3 text-rose-700';
+      return 'cursor-pointer flex justify-between border border-rose-400 rounded bg-rose-100 px-4 py-3 text-rose-700';
     }
 
-    return 'cursor-pointer flex justify-between mt-4 border border-gray-400 rounded bg-gray-100 px-4 py-3 text-gray-700';
+    return 'cursor-pointer flex justify-between border border-slate-50 rounded bg-slate-50 px-4 py-3 text-slate-700';
   };
 
   const toggle = () => {

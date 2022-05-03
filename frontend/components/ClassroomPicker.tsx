@@ -5,13 +5,42 @@ import {} from 'react';
 interface ClassroomPicker {
   isOpen: boolean;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
+  building: string;
+  classrooms: string[];
 }
 
+const ordinal: Record<string, string> = {
+  '1': 'Primer',
+  '2': 'Segundo',
+  '3': 'Tercer',
+  '4': 'Cuarto',
+  '5': 'Quinto',
+  '6': 'Sexto',
+  '7': 'Séptimo',
+  '8': 'Octavo',
+  '9': 'Noveno',
+};
+
 const ClassroomPicker: FC<ClassroomPicker> = ({
-  children,
   isOpen,
   setIsOpen,
+  building,
+  classrooms,
 }) => {
+  const record = classrooms
+    .filter((classroom) => classroom.startsWith(building))
+    .reduce<Record<string, string[]>>((acc, value) => {
+      const floor = value.at(1);
+
+      if (floor) {
+        acc[floor] = [...(acc[floor] ?? []), value];
+      }
+
+      return acc;
+    }, {});
+
+  console.log(record);
+
   return (
     <Dialog
       open={isOpen}
@@ -25,107 +54,28 @@ const ClassroomPicker: FC<ClassroomPicker> = ({
         <h2></h2>
 
         <Dialog.Title className="text-green-500 text-5xl pb-8">
-          Edificio A
+          Edificio {building}
         </Dialog.Title>
 
-        <div className="pb-4">
-          <h2 className="text-cyan-500 text-3xl">Primer Piso</h2>
+        {Object.keys(record).map((floor) => (
+          <div className="pb-4">
+            <h2 className="text-cyan-500 text-3xl">{ordinal[floor]} Piso</h2>
 
-          <div className="flex flex-wrap justify-center">
-            <a href="#" className="text-xl m-2 hover:underline">
-              A101
-            </a>
-
-            <a href="#" className="text-xl m-2 hover:underline">
-              A102
-            </a>
-
-            <a href="#" className="text-xl m-2 hover:underline">
-              A103
-            </a>
-
-            <a href="#" className="text-xl m-2 hover:underline">
-              A104
-            </a>
-
-            <a href="#" className="text-xl m-2 hover:underline">
-              A105
-            </a>
-            <a href="#" className="text-xl m-2 hover:underline">
-              A106
-            </a>
-            <a href="#" className="text-xl m-2 hover:underline">
-              A107
-            </a>
+            <div className="flex flex-wrap justify-center">
+              {record[floor].map((classroom) => (
+                <a
+                  href={`/classrooms/${classroom}`}
+                  className="text-xl m-2 hover:underline"
+                >
+                  {classroom}
+                </a>
+              ))}
+            </div>
           </div>
-        </div>
-
-        <div className="pb-4">
-          <h2 className="text-cyan-500 text-3xl">Segundo Piso</h2>
-
-          <div className="flex flex-wrap justify-center">
-            <a href="#" className="text-xl m-2 hover:underline">
-              A201
-            </a>
-
-            <a href="#" className="text-xl m-2 hover:underline">
-              A202
-            </a>
-
-            <a href="#" className="text-xl m-2 hover:underline">
-              A203
-            </a>
-
-            <a href="#" className="text-xl m-2 hover:underline">
-              A204
-            </a>
-
-            <a href="#" className="text-xl m-2 hover:underline">
-              A205
-            </a>
-            <a href="#" className="text-xl m-2 hover:underline">
-              A206
-            </a>
-            <a href="#" className="text-xl m-2 hover:underline">
-              A207
-            </a>
-          </div>
-        </div>
-
-        <div className="pb-4">
-          <h2 className="text-cyan-500 text-3xl">Tercer Piso</h2>
-
-          <div className="flex flex-wrap justify-center">
-            <a href="#" className="text-xl m-2 hover:underline">
-              A301
-            </a>
-
-            <a href="#" className="text-xl m-2 hover:underline">
-              A302
-            </a>
-
-            <a href="#" className="text-xl m-2 hover:underline">
-              A303
-            </a>
-
-            <a href="#" className="text-xl m-2 hover:underline">
-              A304
-            </a>
-
-            <a href="#" className="text-xl m-2 hover:underline">
-              A305
-            </a>
-            <a href="#" className="text-xl m-2 hover:underline">
-              A306
-            </a>
-            <a href="#" className="text-xl m-2 hover:underline">
-              A307
-            </a>
-          </div>
-        </div>
+        ))}
 
         <button
-          className="m-4 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+          className="m-4 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
           onClick={() => setIsOpen(false)}
         >
           Regresar
