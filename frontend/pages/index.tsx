@@ -18,7 +18,7 @@ const Home: NextPage<{ classrooms: string[] }> = ({ classrooms }) => {
         {buildings.map((b) => (
           <button
             key={b.building}
-            className="absolute bg-red-700 opacity-40"
+            className="absolute"
             style={{
               left: `${b.x}%`,
               top: `${b.y}%`,
