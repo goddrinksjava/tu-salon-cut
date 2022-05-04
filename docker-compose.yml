@@ -86,7 +86,7 @@ services:
     build:
       context: ./
       dockerfile: ./docker/frontend/Dockerfile
-    command: sh -c "yarn install && yarn start:dev"
+    command: sh -c "yarn install && yarn start:prod"
     restart: always
     environment:
       - API_PATH=http://backend:4000

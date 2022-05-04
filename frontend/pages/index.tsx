@@ -1,4 +1,6 @@
 import type { GetStaticProps, NextPage } from 'next';
+import Image from 'next/image';
+import Link from 'next/link';
 import { useState } from 'react';
 import ClassroomPicker from '../components/ClassroomPicker';
 import SearchBar from '../components/SearchBar';
@@ -10,11 +12,16 @@ const Home: NextPage<{ classrooms: string[] }> = ({ classrooms }) => {
 
   return (
     <div className="absolute max-h-full max-w-full overflow-y-scroll">
-      <div className="p-2">
+      <div className="p-2 flex">
+        <div className="shrink-0 flex justify-start items-center px-4">
+          <Link href="login">
+            <a className="hover:underline">Iniciar sesión</a>
+          </Link>
+        </div>
         <SearchBar list={classrooms} />
       </div>
       <div className="relative">
-        <img src="/map.jpg" alt="mapa" className="" />
+        <Image src="/map.jpg" alt="mapa" />
         {buildings.map((b) => (
           <button
             key={b.building}

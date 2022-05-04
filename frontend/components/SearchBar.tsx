@@ -28,7 +28,7 @@ const SearchBar: FC<ISearchBarProps> = ({ list }) => {
     return sorted;
   };
 
-  const results = useMemo(getMatches, [value]);
+  const results = useMemo(getMatches, [value, list]);
 
   const ref = useRef<HTMLDivElement>(null);
 
@@ -52,7 +52,7 @@ const SearchBar: FC<ISearchBarProps> = ({ list }) => {
   };
 
   return (
-    <div ref={ref}>
+    <div ref={ref} className="w-full">
       <div className="bg-white rounded-md border flex flex-row items-center space-x-2 p-2">
         <div className="flex-grow bg-slate-100 rounded-md flex flex-row items-center space-x-2 p-2">
           <Search theme="outline" size="20" fill="#333" />

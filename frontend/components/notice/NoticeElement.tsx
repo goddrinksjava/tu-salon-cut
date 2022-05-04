@@ -14,10 +14,11 @@ export const NoticeElement: FC<RenderElementProps & { noticeId: number }> = ({
       return (
         <NoticeImage
           attributes={attributes}
-          children={children}
           element={element}
           noticeId={noticeId}
-        />
+        >
+          {children}
+        </NoticeImage>
       );
     case 'list-item':
       return <li>{children}</li>;
@@ -27,11 +28,9 @@ export const NoticeElement: FC<RenderElementProps & { noticeId: number }> = ({
       return <ul className="list-inside list-disc">{children}</ul>;
     case 'title':
       return (
-        <NoticeTitle
-          attributes={attributes}
-          children={children}
-          element={element}
-        />
+        <NoticeTitle attributes={attributes} element={element}>
+          {children}
+        </NoticeTitle>
       );
     case 'paragraph':
       return (

@@ -5,7 +5,7 @@ interface IClassroomProblemProps {
   label: string;
   count: number;
   checked: boolean;
-  setChecked: React.Dispatch<React.SetStateAction<boolean>>;
+  setChecked: (v: boolean) => void;
 }
 
 const ClassroomProblem: FC<IClassroomProblemProps> = ({

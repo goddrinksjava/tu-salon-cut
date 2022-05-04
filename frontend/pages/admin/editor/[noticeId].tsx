@@ -44,8 +44,7 @@ const EditorPage: NextPage<{
       withCorrectVoidBehavior(
         withLayout(withImages(withHistory(withReact(createEditor())))),
       ),
-
-    [],
+    [withImages],
   );
 
   const initialValue: Descendant[] = editorDocument || defaultValue;

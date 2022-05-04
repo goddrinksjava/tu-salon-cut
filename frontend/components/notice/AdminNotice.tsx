@@ -41,7 +41,7 @@ const AdminNotice: FC<IAdminNoticeProps> = ({
         withLayout(withImages(withHistory(withReact(createEditor())))),
       ),
 
-    [],
+    [withImages],
   );
 
   return (

@@ -47,7 +47,9 @@ const ClassroomProblems: NextPage<IClassroomProblemsProps> = ({
   const [submitting, setSubmitting] = useState(false);
   const [commentState, setCommentState] = useState<string>(comment ?? '');
 
-  const stateArray = complaints.map(({ checked }) => useState(checked));
+  const [stateArray, setStateArray] = useState(
+    complaints.map(({ checked }) => checked),
+  );
 
   const reset = async () => {
     setSubmitting(true);
@@ -74,7 +76,7 @@ const ClassroomProblems: NextPage<IClassroomProblemsProps> = ({
     };
 
     for (let i = 0; i < stateArray.length; i++) {
-      if (stateArray[i][0]) {
+      if (stateArray[i]) {
         submitData.classroomProblemsId.push(complaints[i].id);
       }
     }
@@ -183,8 +185,12 @@ const ClassroomProblems: NextPage<IClassroomProblemsProps> = ({
                   key={id}
                   label={label}
                   count={parseInt(count)}
-                  checked={stateArray[i][0]}
-                  setChecked={stateArray[i][1]}
+                  checked={stateArray[i]}
+                  setChecked={(v) => {
+                    const newStateArray = [...stateArray];
+                    newStateArray[i] = v;
+                    setStateArray(newStateArray);
+                  }}
                   disabled={userType != 'user'}
                 />
               );

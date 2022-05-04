@@ -58,12 +58,13 @@ const ClassroomPicker: FC<ClassroomPicker> = ({
         </Dialog.Title>
 
         {Object.keys(record).map((floor) => (
-          <div className="pb-4">
+          <div className="pb-4" key={floor}>
             <h2 className="text-cyan-500 text-3xl">{ordinal[floor]} Piso</h2>
 
             <div className="flex flex-wrap justify-center">
               {record[floor].map((classroom) => (
                 <a
+                  key={classroom}
                   href={`/classrooms/${classroom}`}
                   className="text-xl m-2 hover:underline"
                 >

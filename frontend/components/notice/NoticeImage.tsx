@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { FC } from 'react';
 import {
   ReactEditor,
@@ -29,7 +30,7 @@ export const NoticeImage: FC<
           className={`z-0 absolute bg-blue-700 w-full h-full top-0 left-0`}
         />
 
-        <img
+        <Image
           src={`/api/notices/${noticeId}/${element.filename}`}
           className={`relative z-10 w-full ${
             selected && focused ? 'opacity-70' : 'opacity-100'

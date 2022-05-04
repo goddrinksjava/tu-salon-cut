@@ -125,7 +125,7 @@ const AdminPage: NextPage<{ notices: INotice[] }> = (props) => {
       </div>
 
       <div className="pt-2">
-        <AppButton color="green" type="submit" onclick={createNewNotice}>
+        <AppButton color="emerald" type="submit" onclick={createNewNotice}>
           Nuevo anuncio
         </AppButton>
       </div>
