@@ -48,8 +48,17 @@ interface IGetComplaintsWithCheckedByUserOutput {
 
 const getComplaintsWithCheckedByUser = async (
   classroomName: string,
-  userId: number,
+  userId: number | null,
 ): Promise<IGetComplaintsWithCheckedByUserOutput[]> => {
+  if (userId == null) {
+    const complaints = await getComplaints(classroomName);
+    return complaints.map((complaint) => {
+      const result = complaint as IGetComplaintsWithCheckedByUserOutput;
+      result.checked = false;
+      return result;
+    });
+  }
+
   const promise1 = getComplaints(classroomName);
   const promise2 = getUserComplaints(classroomName, userId);
 
@@ -58,7 +67,6 @@ const getComplaintsWithCheckedByUser = async (
   return complaints.map((complaint) => {
     const result = complaint as IGetComplaintsWithCheckedByUserOutput;
     result.checked = userComplaints.includes(result.label);
-    console.log(result);
     return result;
   });
 };

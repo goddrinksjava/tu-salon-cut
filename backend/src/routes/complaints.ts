@@ -33,15 +33,15 @@ complaintsRouter.post(
 
 complaintsRouter.get(
   '/:classroomId',
-  authenticate(),
   async (req: Request, res: Response, next: NextFunction) => {
     const { classroomId } = req.params;
 
     try {
       const existsPromise = classroomExists(classroomId);
+
       const complaintsPromise = getComplaintsWithCheckedByUser(
         classroomId,
-        req.user.id,
+        req.user?.id ?? null,
       );
 
       const [exists, complaints] = await Promise.all([
