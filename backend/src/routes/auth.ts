@@ -10,6 +10,7 @@ import {
 import { validateBody } from '../middleware/validateMiddleware';
 import { credentialsSchema } from '../schema/credentials';
 import redis from '../redis';
+import authenticate from '../middleware/authenticateMiddleware';
 
 const authRouter: Router = express.Router();
 
@@ -108,19 +109,24 @@ authRouter.post(
 
 authRouter.get(
   '/userType',
+  authenticate({ allowGuests: true }),
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const user = req.session.user;
+      const user = req.user;
 
-      if (user === undefined) {
+      if (user == null) {
         return res.json('guest');
       }
 
-      if (!user.isAdmin) {
-        return res.json('user');
+      if (user.isAdmin) {
+        res.json('admin');
       }
 
-      res.json('admin');
+      if (user.isVerified) {
+        return res.json('verified');
+      }
+
+      return res.json('unverified');
     } catch (error) {
       next(error);
     }

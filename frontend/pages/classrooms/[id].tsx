@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { GetServerSideProps, NextPage } from 'next';
 import ClassroomProblem from '../../components/ClassroomProblem';
 import AppButton from '../../components/AppButton';
@@ -17,13 +17,13 @@ interface IClassroomComplaints {
 
 type IClassroomProblemsProps =
   | {
-      userType: 'guest';
+      userType: 'guest' | 'unverified';
       complaints: IClassroomComplaints[];
       comment: undefined;
       comments: undefined;
     }
   | {
-      userType: 'user';
+      userType: 'verified';
       complaints: IClassroomComplaints[];
       comment: string;
       comments: undefined;
@@ -41,6 +41,14 @@ const ClassroomProblems: NextPage<IClassroomProblemsProps> = ({
   comments,
   userType,
 }) => {
+  useEffect(() => {
+    if (userType == 'unverified') {
+      toast('Verificación de correo electrónico pendiente', {
+        type: 'info',
+      });
+    }
+  }, [userType]);
+
   const router = useRouter();
   const { id } = router.query;
 
@@ -130,8 +138,9 @@ const ClassroomProblems: NextPage<IClassroomProblemsProps> = ({
       <div className="bg-white flex justify-center">
         {
           {
+            unverified: null,
             guest: null,
-            user: (
+            verified: (
               <div className="flex-auto flex flex-col pt-8 px-6 mx-auto w-1/2">
                 <label
                   htmlFor="comment"
@@ -191,7 +200,7 @@ const ClassroomProblems: NextPage<IClassroomProblemsProps> = ({
                     newStateArray[i] = v;
                     setStateArray(newStateArray);
                   }}
-                  disabled={userType != 'user'}
+                  disabled={userType != 'verified'}
                 />
               );
             })}
@@ -201,8 +210,9 @@ const ClassroomProblems: NextPage<IClassroomProblemsProps> = ({
 
       {
         {
+          unverified: null,
           guest: null,
-          user: (
+          verified: (
             <div className="mt-4 pt-8 px-6 mx-auto">
               <AppButton color="emerald" disabled={submitting} onclick={save}>
                 Guardar
@@ -267,6 +277,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   console.log('usertype', userType);
 
   switch (userType) {
+    case 'unverified':
     case 'guest':
       return {
         props: {
@@ -274,7 +285,7 @@ export const getServerSideProps: GetServerSideProps = async ({
           complaints,
         },
       };
-    case 'user':
+    case 'verified':
       const commentResponse = await fetch(
         `${process.env.API_PATH}/comments/${query.id}`,
         {

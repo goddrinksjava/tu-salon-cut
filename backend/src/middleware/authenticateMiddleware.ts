@@ -3,11 +3,16 @@ import { isEmailValidated } from '../services/userService';
 
 //TODO cache returned function
 const authenticate =
-  ({ mustBeAdmin } = { mustBeAdmin: false }) =>
+  ({ mustBeAdmin = false, allowGuests = false } = {}) =>
   async (req: Request, res: Response, next: NextFunction) => {
     const user = req.session.user;
 
     if (!user) {
+      if (allowGuests) {
+        req.user = null;
+        return next();
+      }
+
       res.status(401);
       return res.json({ error: 'unauthenticated' });
     }

@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start:dev": "yarn install && next dev",
-    "start:prod": "next build && next start",
+    "start:dev": "next dev",
+    "start:prod": "next start",
     "build": "next build",
     "lint": "next lint"
   },
