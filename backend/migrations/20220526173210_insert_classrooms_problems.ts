@@ -1,6 +1,14 @@
 import { Knex } from 'knex';
 
-const labels = ['Sucio', 'Proyector descompuesto', 'Hacen falta butacas'];
+const labels = [
+  'Butacas en mal estado',
+  'Enchufes en mal estado',
+  'Puerta dañada',
+  'Falso contacto',
+  'Lamparas dañadas',
+  'Ventilador dañado',
+  'Pizarrón roto',
+];
 
 export async function up(knex: Knex): Promise<void> {
   await knex('classroom_problems').insert(
