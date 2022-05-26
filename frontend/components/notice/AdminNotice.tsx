@@ -40,8 +40,7 @@ const AdminNotice: FC<IAdminNoticeProps> = ({
       withCorrectVoidBehavior(
         withLayout(withImages(withHistory(withReact(createEditor())))),
       ),
-
-    [withImages],
+    [],
   );
 
   return (

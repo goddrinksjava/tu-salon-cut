@@ -30,8 +30,7 @@ const PublicNotice: FC<IPublicNoticeProps> = ({ notice }) => {
       withCorrectVoidBehavior(
         withLayout(withImages(withHistory(withReact(createEditor())))),
       ),
-
-    [withImages],
+    [],
   );
 
   return (
