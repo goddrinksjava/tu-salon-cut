@@ -8,11 +8,6 @@ export const loginAndSignupGetSSP: GetServerSideProps = async ({ req }) => {
     `${process.env.API_PATH}/classrooms/worst`,
   );
 
-  //TODO
-  if (!noticesResponse.ok || !noticesResponse.ok) {
-    throw noticesResponse.status;
-  }
-
   const notices = await noticesResponse.json();
   const worstClassrooms = await worstClassroomsResponse.json();
 

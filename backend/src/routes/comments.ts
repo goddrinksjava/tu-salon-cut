@@ -29,7 +29,6 @@ commentsRouter.get(
   },
 );
 
-//TODO schema
 commentsRouter.post(
   '/:classroomId',
   authenticate(),

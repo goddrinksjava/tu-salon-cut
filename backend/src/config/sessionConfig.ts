@@ -2,7 +2,7 @@ import { SessionOptions } from 'express-session';
 
 const sessionConfig: SessionOptions = {
   // Use an array of secrets to support key rotation as an additional security measure.
-  secret: [process.env.SESSION_SECRET_1, process.env.SESSION_SECRET_2],
+  secret: process.env.SESSION_SECRETS.split(' '),
   resave: false,
   saveUninitialized: false,
   rolling: true,

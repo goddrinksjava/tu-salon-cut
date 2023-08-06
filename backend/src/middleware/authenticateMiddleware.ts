@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { isEmailValidated } from '../services/userService';
 
-//TODO cache returned function
 const authenticate =
   ({ mustBeAdmin = false, allowGuests = false } = {}) =>
   async (req: Request, res: Response, next: NextFunction) => {

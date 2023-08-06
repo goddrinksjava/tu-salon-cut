@@ -39,8 +39,6 @@ const ClassroomPicker: FC<ClassroomPicker> = ({
       return acc;
     }, {});
 
-  console.log(record);
-
   return (
     <Dialog
       open={isOpen}

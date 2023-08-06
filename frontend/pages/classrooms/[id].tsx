@@ -89,8 +89,6 @@ const ClassroomProblems: NextPage<IClassroomProblemsProps> = ({
       }
     }
 
-    console.log(submitData);
-
     const complaintsResponse = await fetch(`/api/complaints/${id}`, {
       method: 'POST',
       headers: {
@@ -273,8 +271,6 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   const complaints = await complaintsResponse.json();
   const userType: UserType = await userTypeResponse.json();
-
-  console.log('usertype', userType);
 
   switch (userType) {
     case 'unverified':

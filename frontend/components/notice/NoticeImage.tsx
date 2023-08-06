@@ -20,12 +20,7 @@ export const NoticeImage: FC<
   return (
     <div>
       {children}
-      <div
-        {...attributes}
-        contentEditable={false}
-        className="relative"
-        onDrag={(ev) => console.log('yo')}
-      >
+      <div {...attributes} contentEditable={false} className="relative">
         <div
           className={`z-0 absolute bg-blue-700 w-full h-full top-0 left-0`}
         />

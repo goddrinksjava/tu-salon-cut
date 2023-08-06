@@ -49,13 +49,10 @@ complaintsRouter.get(
         complaintsPromise,
       ]);
 
-      console.log(exists);
-
       if (!exists) {
         res.sendStatus(404);
       }
 
-      console.log(complaints);
       res.json(complaints);
     } catch (err) {
       next(err);

@@ -21,8 +21,6 @@ const Editor: NextPage<{
   const router = useRouter();
   const [error, setError] = useState<string | undefined>(undefined);
 
-  console.log(notices);
-
   return (
     <>
       <Head>
@@ -74,8 +72,6 @@ const Editor: NextPage<{
                   },
                   body: JSON.stringify(data),
                 });
-
-                console.log(response);
 
                 if (response.status == 200) {
                   router.push('/');

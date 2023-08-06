@@ -13,7 +13,6 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   const response = await fetch(
     `${process.env.API_PATH}/auth/verifyEmail/${query.uuid}`,
   );
-  console.log(response);
 
   if (response.ok) {
     return { props: {} };

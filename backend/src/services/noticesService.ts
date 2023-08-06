@@ -42,8 +42,6 @@ export const getNotices = async ({
     query.offset(pagination.offset);
   }
 
-  console.log(query.toSQL());
-
   return await query;
 };
 

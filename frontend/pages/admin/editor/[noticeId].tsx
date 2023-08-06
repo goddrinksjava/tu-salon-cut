@@ -112,8 +112,6 @@ const UploadButton: FC<{ noticeId: number; editor: Editor }> = ({
       body: JSON.stringify({ document: editor.children }),
     });
 
-    console.log(response);
-
     if (response.status == 200) {
       toast('Datos guardados', {
         type: 'success',
@@ -337,8 +335,6 @@ export const getServerSideProps: GetServerSideProps = async ({
     };
   }
 
-  console.log(query.noticeId);
-
   const response = await fetch(
     `${process.env.API_PATH}/notices/${query.noticeId}`,
     {
@@ -347,8 +343,6 @@ export const getServerSideProps: GetServerSideProps = async ({
       },
     },
   );
-
-  console.log(response);
 
   if (response.ok) {
     const { document } = await response.json();

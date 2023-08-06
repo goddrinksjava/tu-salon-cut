@@ -33,8 +33,6 @@ const SearchBar: FC<ISearchBarProps> = ({ list }) => {
   const ref = useRef<HTMLDivElement>(null);
 
   const hideResults = (ev: Event) => {
-    console.log(ev.target);
-    console.log(ref.current);
     if (
       ev.target == ref.current ||
       (ref.current && ref.current.contains(ev.target as Element))

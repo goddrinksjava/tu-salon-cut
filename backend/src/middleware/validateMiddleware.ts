@@ -10,7 +10,7 @@ export const validateBody =
       return next();
     } catch (err) {
       if (err instanceof ValidationError) {
-        console.log(err);
+        console.error(err);
         return res.sendStatus(400);
       }
       return res.sendStatus(500);
@@ -26,7 +26,7 @@ export const validateQuery =
       return next();
     } catch (err) {
       if (err instanceof ValidationError) {
-        console.log(err);
+        console.error(err);
         return res.sendStatus(400);
       }
       return res.sendStatus(500);

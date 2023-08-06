@@ -21,8 +21,6 @@ const setComplaints = async (
 
   const trx = await db.transaction();
 
-  console.log(inserts);
-
   try {
     await db('classroom_complaints')
       .transacting(trx)

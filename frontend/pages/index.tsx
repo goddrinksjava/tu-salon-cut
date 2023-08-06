@@ -1,4 +1,4 @@
-import type { GetStaticProps, NextPage } from 'next';
+import type { GetServerSideProps, GetStaticProps, NextPage } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -6,8 +6,12 @@ import ClassroomPicker from '../components/ClassroomPicker';
 import Navbar from '../components/Navbar';
 import SearchBar from '../components/SearchBar';
 import buildings from '../json/buildings.json';
+import { UserType } from '../types/userTypes';
 
-const Home: NextPage<{ classrooms: string[] }> = ({ classrooms }) => {
+const Home: NextPage<{ classrooms: string[]; userType: UserType }> = ({
+  classrooms,
+  userType,
+}) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [building, setBuilding] = useState('');
 
@@ -15,12 +19,12 @@ const Home: NextPage<{ classrooms: string[] }> = ({ classrooms }) => {
     <div className="absolute overflow-y-scroll">
       {/* <Navbar /> */}
       <div className="p-2 flex">
+        <SearchBar list={classrooms} />
         <div className="shrink-0 flex justify-start items-center px-4">
           <Link href="login">
             <a className="hover:underline">Iniciar sesión</a>
           </Link>
         </div>
-        <SearchBar list={classrooms} />
       </div>
       <div className="relative w-full h-fit">
         <img src="/map.jpg" alt="mapa" />
@@ -52,16 +56,24 @@ const Home: NextPage<{ classrooms: string[] }> = ({ classrooms }) => {
   );
 };
 
-export const getStaticProps: GetStaticProps = async () => {
-  const response = await fetch(`${process.env.API_PATH}/classrooms`);
+export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+  const classroomsPromise = fetch(`${process.env.API_PATH}/classrooms`);
 
-  if (response.ok) {
-    const classrooms = await response.json();
-    return { props: { classrooms } };
-  } else if (response.status == 404) {
-    return {
-      notFound: true,
-    };
+  const userTypePromise = fetch(`${process.env.API_PATH}/auth/userType`, {
+    headers: {
+      cookie: `connect.sid=${req.cookies['connect.sid']}`,
+    },
+  });
+
+  const [classroomsResponse, userTypeResponse] = await Promise.all([
+    classroomsPromise,
+    userTypePromise,
+  ]);
+
+  if (classroomsResponse.ok && userTypeResponse.ok) {
+    const classrooms = await classroomsResponse.json();
+    const userType = await userTypeResponse.json();
+    return { props: { classrooms, userType } };
   } else {
     return {
       redirect: {

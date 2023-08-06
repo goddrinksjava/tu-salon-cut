@@ -6,5 +6,5 @@ import db from './knex';
 const port = 4000;
 
 app.listen(port, function () {
-  console.log(`App is listening on port ${port}`);
+  console.info(`App is listening on port ${port}`);
 });

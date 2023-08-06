@@ -78,8 +78,6 @@ const Editor: NextPage<{
                   body: JSON.stringify(submitData),
                 });
 
-                console.log(response);
-
                 if (response.status == 200) {
                   router.push('/');
                 } else if (response.status == 400) {

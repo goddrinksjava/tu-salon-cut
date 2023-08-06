@@ -12,7 +12,6 @@ import {
 
 const noticesRouter: Router = express.Router();
 
-//TODO schema
 noticesRouter.get(
   '/all',
   authenticate({ mustBeAdmin: true }),

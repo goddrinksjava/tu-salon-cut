@@ -17,17 +17,12 @@ const AdminPage: NextPage<{ notices: INotice[] }> = (props) => {
   const [notices, setNotices] = useState(props.notices);
 
   const createNewNotice = async () => {
-    console.log('yo');
-
     const response = await fetch('/api/editor/createNotice', {
       method: 'POST',
     });
 
-    console.log(response);
-
     if (response.status == 200) {
       const { id } = await response.json();
-      console.log(id);
       router.push(`/admin/editor/${id}`);
     } else if (response.status == 400) {
       const { error } = await response.json();
@@ -151,7 +146,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
 
   if (response.ok) {
     const notices = await response.json();
-    console.log(notices);
     return { props: { notices } };
   } else if (response.status == 404) {
     return {

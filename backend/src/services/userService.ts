@@ -24,11 +24,11 @@ export const createUser = async (
 
     const user = result.at(0) || null;
 
-    await sendConfirmationEmail(user.id, user.email); //TODO handle exception
+    await sendConfirmationEmail(user.id, user.email);
 
     return user;
   } catch (err) {
-    console.log(err);
+    console.error(err);
     if (err instanceof DatabaseError && err.code == '23505') {
       return 'EmailTaken';
     }
@@ -53,13 +53,9 @@ export const sendConfirmationEmail = async (
     subject: 'Verificación de correo electrónico',
     text: `Ingresa al siguiente link para verificar tu cuenta: http://localhost:3000/verifica/${uuid}`,
   });
-
-  console.log(info);
 };
 
 export const verifyEmail = async (uuid: string) => {
-  //TODO handle exceptions
-
   const userId = await redis.get(uuid);
 
   await db('users')

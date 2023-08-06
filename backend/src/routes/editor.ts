@@ -54,7 +54,6 @@ editorRouter.post(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const id = await createNotice();
-      console.log(id);
       res.json(id);
     } catch (err) {
       next(err);
@@ -62,7 +61,6 @@ editorRouter.post(
   },
 );
 
-//TODO schema
 editorRouter.post(
   '/:noticeId/setPublic',
   authenticate({ mustBeAdmin: true }),
@@ -86,7 +84,6 @@ editorRouter.post(
   },
 );
 
-//TODO schema
 editorRouter.post(
   '/:noticeId/setPrivate',
   authenticate({ mustBeAdmin: true }),
@@ -110,7 +107,6 @@ editorRouter.post(
   },
 );
 
-//TODO schema
 editorRouter.post(
   '/:noticeId/updateNotice',
   authenticate({ mustBeAdmin: true }),

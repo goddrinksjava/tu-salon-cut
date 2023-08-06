@@ -24,8 +24,6 @@ export const getServerSideProps: GetServerSideProps = async ({
     },
   });
 
-  console.log(response);
-
   if (response.ok) {
     return {
       redirect: {
