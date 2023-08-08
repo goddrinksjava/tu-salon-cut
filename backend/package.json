@@ -5,7 +5,8 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc",
-    "start:dev": "npx knex migrate:latest && DEBUG=express:* ts-node-dev --respawn --transpile-only src/index.ts",
+    "migrate:latest": "knex migrate:latest",
+    "start:dev": "DEBUG=express:* ts-node-dev --respawn --transpile-only src/index.ts",
     "start:prod": "node dist/src/index.js"
   },
   "jest": {

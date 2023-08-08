@@ -1,10 +1,22 @@
-import app from './expressApp';
+import loadApp from './expressApp';
 import db from './knex';
 
-// db.migrate.latest();
+const port = process.env.PORT ?? 4000;
 
-const port = 4000;
+async function main() {
+  try {
+    await db.migrate.latest();
+    console.log('Migrations ran successfully');
+    await db.seed.run();
+    console.log('Seeds ran successfully');
 
-app.listen(port, function () {
-  console.info(`App is listening on port ${port}`);
-});
+    const app = loadApp();
+    app.listen(port, function () {
+      console.info(`App is listening on port ${port}`);
+    });
+  } catch (error) {
+    console.error('Error starting the app:', error);
+  }
+}
+
+main();

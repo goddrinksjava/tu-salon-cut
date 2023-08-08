@@ -10,28 +10,32 @@ import classroomsRouter from './routes/classrooms';
 import editorRouter from './routes/editor';
 import noticesRouter from './routes/notices';
 
-const app: Application = express();
+function loadApp(): Application {
+  const app: Application = express();
 
-// app.set('trust proxy', 1);
+  // app.set('trust proxy', 1);
 
-let RedisStore = connect(session);
+  let RedisStore = connect(session);
 
-app.use(
-  session({
-    store: new RedisStore({ client: redis }),
-    ...sessionConfig,
-  }),
-);
+  app.use(
+    session({
+      store: new RedisStore({ client: redis }),
+      ...sessionConfig,
+    }),
+  );
 
-app.use(express.json());
+  app.use(express.json());
 
-app.use('/auth', authRouter);
-app.use('/complaints', complaintsRouter);
-app.use('/comments', commentsRouter);
-app.use('/classrooms', classroomsRouter);
-app.use('/notices', noticesRouter);
-app.use('/editor', editorRouter);
+  app.use('/auth', authRouter);
+  app.use('/complaints', complaintsRouter);
+  app.use('/comments', commentsRouter);
+  app.use('/classrooms', classroomsRouter);
+  app.use('/notices', noticesRouter);
+  app.use('/editor', editorRouter);
 
-app.use(express.static('public'));
+  app.use(express.static('public'));
 
-export default app;
+  return app;
+}
+
+export default loadApp;

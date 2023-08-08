@@ -74,8 +74,8 @@ services:
       cache:
         condition: service_healthy
     volumes:
-      - ./backend:/app/backend
-      - /app/backend/node_modules
+      - ./backend:/srv/backend
+      - backend_node_modules:/srv/backend/node_modules
 
   frontend:
     build:
@@ -88,8 +88,8 @@ services:
     ports:
       - '3000:3000'
     volumes:
-      - ./frontend:/app/frontend
-      - /app/frontend/node_modules
+      - ./frontend:/srv/frontend
+      - frontend_node_modules:/srv/frontend/node_modules
 
   mailhog:
     image: mailhog/mailhog
@@ -100,6 +100,6 @@ services:
 
 volumes:
   db:
-    driver: local
   cache:
-    driver: local
+  backend_node_modules:
+  frontend_node_modules:
