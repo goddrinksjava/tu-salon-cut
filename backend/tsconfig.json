@@ -27,6 +27,8 @@
     ],
     "include": [
         "src/**/*.ts",
+        "seeds/**/*.ts",
+        "migrations/**/*.ts",
         "tests/**/*.spec.ts"
     ],
 }

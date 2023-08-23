@@ -1,18 +1,40 @@
 version: '3'
 services:
-  frontend:
+  development:
     build:
-      target: development
+      context: ./
+      dockerfile: ./docker/development/Dockerfile
+    environment:
+      NODE_ENV: development
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_HOST: db
+      REDIS_HOST: cache
+      SESSION_SECRETS: ${SESSION_SECRETS}
+      SMTP_HOST: mailhog
+      SMTP_PORT: 1025
+      API_PATH: http://development:4000
+    ports:
+      - '4000:4000'
+      - '3000:3000'
+    depends_on:
+      db:
+        condition: service_healthy
+      cache:
+        condition: service_healthy
+    env_file: .env
     volumes:
-      # Update this to wherever you want VS Code to mount the folder of your project
-      - ..:/workspaces:cached
-    # Uncomment the next four lines if you will use a ptrace-based debugger like C++, Go, and Rust.
-    # cap_add:
-    #   - SYS_PTRACE
-    # security_opt:
-    #   - seccomp:unconfined
-  backend:
+      - .:/srv/tu-salon-cut
+      - /srv/tu-salon-cut/frontend/node_modules
+      - /srv/tu-salon-cut/backend/node_modules
+  webserver:
     build:
-      target: development
+      context: ./
+      dockerfile: ./docker/webserver/Dockerfile
+    restart: always
+    ports:
+      - 80:80
+    env_file: .env
     volumes:
-      - ..:/workspaces:cached
+      - ./.devcontainer/nginx.conf:/etc/nginx/nginx.conf 

@@ -1,5 +1,5 @@
-# Development Stage
-FROM node:18 AS development
+# Build Stage
+FROM node:18 AS build
 WORKDIR /srv/frontend
 
 # Install packages
@@ -8,12 +8,6 @@ RUN npm install
 
 # Copy source files
 COPY frontend .
-
-EXPOSE 3000
-CMD ["npm", "run", "start:dev"]
-
-# Build Stage
-FROM development AS build
 RUN npm run build
 
 # Production Stage
@@ -27,6 +21,7 @@ RUN npm install
 
 # Copy built assets from development stage
 COPY --from=build /srv/frontend/.next /srv/frontend/.next
+COPY --from=build /srv/frontend/public /srv/frontend/public
 
 EXPOSE 3000
-CMD ["npm", "run", "start:prod"]
+ENTRYPOINT ["npm", "run", "start:prod"]

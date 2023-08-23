@@ -30,7 +30,7 @@ const PublicNotice: FC<IPublicNoticeProps> = ({ notice }) => {
       withCorrectVoidBehavior(
         withLayout(withImages(withHistory(withReact(createEditor())))),
       ),
-    [withImages],
+    [],
   );
 
   return (
@@ -44,9 +44,8 @@ const PublicNotice: FC<IPublicNoticeProps> = ({ notice }) => {
 
         <div className="flex items-end">
           <button
-            className={`block cursor-default transition-transform ease-in-out duration-200 ${
-              isOpened ? 'rotate-180' : ''
-            }`}
+            className={`block cursor-default transition-transform ease-in-out duration-200 ${isOpened ? 'rotate-180' : ''
+              }`}
             onClick={() => setIsOpened(!isOpened)}
             disabled={!titleText}
           >

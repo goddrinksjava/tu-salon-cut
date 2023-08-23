@@ -9,7 +9,7 @@ const sessionConfig: SessionOptions = {
   cookie: {
     secure: false,
     httpOnly: true,
-    sameSite: 'none',
+    sameSite: 'strict',
     maxAge: 1000 * 60 * 60 * 24, // 1 day
   },
 };

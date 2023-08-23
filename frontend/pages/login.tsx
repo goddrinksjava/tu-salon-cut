@@ -13,6 +13,7 @@ import PublicNotice from '../components/notice/PublicNotice';
 import { WorstClassrooms } from '../types/worstClassrooms';
 import BadClassroom from '../components/BadClassroom';
 import { loginAndSignupGetSSP } from '../util/loginAndSignupGetSSP';
+import AppNavbar from '../components/AppNavbar';
 
 const Editor: NextPage<{
   notices: INotice[];
@@ -26,6 +27,8 @@ const Editor: NextPage<{
       <Head>
         <title>Inicio de sesión</title>
       </Head>
+
+      <AppNavbar></AppNavbar>
 
       <div className="bg-white flex justify-center items-center h-screen md:divide-x">
         <div className="h-full max-h-screen flex-auto hidden md:flex flex-col w-full mx-auto">

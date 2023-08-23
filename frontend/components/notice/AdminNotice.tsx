@@ -40,16 +40,15 @@ const AdminNotice: FC<IAdminNoticeProps> = ({
       withCorrectVoidBehavior(
         withLayout(withImages(withHistory(withReact(createEditor())))),
       ),
-    [withImages],
+    [],
   );
 
   return (
     <div>
       <div className="flex justify-between">
         <p
-          className={`block text-5xl whitespace-normal text-justify items-center mr-8 ${
-            titleText ? '' : 'text-neutral-400'
-          }`}
+          className={`block text-5xl whitespace-normal text-justify items-center mr-8 ${titleText ? '' : 'text-neutral-400'
+            }`}
         >
           {titleText ?? 'Anuncio sin titulo'}
         </p>
@@ -94,9 +93,8 @@ const AdminNotice: FC<IAdminNoticeProps> = ({
           </div>
 
           <button
-            className={`block cursor-default transition-transform ease-in-out duration-200 ${
-              isOpened ? 'rotate-180' : ''
-            }`}
+            className={`block cursor-default transition-transform ease-in-out duration-200 ${isOpened ? 'rotate-180' : ''
+              }`}
             onClick={() => setIsOpened(!isOpened)}
             disabled={!titleText}
           >

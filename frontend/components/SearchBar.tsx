@@ -25,7 +25,7 @@ const SearchBar: FC<ISearchBarProps> = ({ list }) => {
       return a.target.localeCompare(b.target);
     });
 
-    return sorted;
+    return sorted.slice(0, 10);
   };
 
   const results = useMemo(getMatches, [value, list]);
@@ -69,11 +69,10 @@ const SearchBar: FC<ISearchBarProps> = ({ list }) => {
       </div>
 
       <div
-        className={`bg-white rounded-md border ${
-          hidden || results.length == 0
-            ? 'hidden'
-            : 'flex flex-row items-center'
-        } space-x-2 p-2 mt-2`}
+        className={`bg-white rounded-md border ${hidden || results.length == 0
+          ? 'hidden'
+          : 'flex flex-row items-center'
+          } space-x-2 p-2 mt-2`}
       >
         {results.map((match) => (
           <a

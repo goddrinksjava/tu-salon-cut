@@ -15,6 +15,7 @@ import { loginAndSignupGetSSP } from '../util/loginAndSignupGetSSP';
 import { INotice } from './admin';
 import BadClassroom from '../components/BadClassroom';
 import PublicNotice from '../components/notice/PublicNotice';
+import AppNavbar from '../components/AppNavbar';
 
 const Editor: NextPage<{
   notices: INotice[];
@@ -27,6 +28,8 @@ const Editor: NextPage<{
       <Head>
         <title>Registro</title>
       </Head>
+
+      <AppNavbar></AppNavbar>
 
       <ToastContainer />
 

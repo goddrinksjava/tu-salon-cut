@@ -16,7 +16,7 @@ declare module 'knex/types/tables' {
       // "created_at" and "updated_at" optional.
       // "id" can't be provided.
       Pick<User, 'email' | 'hashed_password'> &
-        Partial<Pick<User, 'created_at' | 'updated_at' | 'email_validated_at'>>,
+        Partial<Pick<User, 'created_at' | 'updated_at' | 'email_validated_at' | 'is_admin'>>,
       // This wil allow updating all fields except "id" and "is_admin".
       Partial<Omit<User, 'id' | 'is_admin'>>
     >;

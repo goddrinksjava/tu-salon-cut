@@ -7,6 +7,8 @@ import { useRouter } from 'next/router';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { UserType } from '../../types/userTypes';
+import Head from 'next/head';
+import AppNavbar from '../../components/AppNavbar';
 
 interface IClassroomComplaints {
   id: number;
@@ -17,23 +19,23 @@ interface IClassroomComplaints {
 
 type IClassroomProblemsProps =
   | {
-      userType: 'guest' | 'unverified';
-      complaints: IClassroomComplaints[];
-      comment: undefined;
-      comments: undefined;
-    }
+    userType: 'guest' | 'unverified';
+    complaints: IClassroomComplaints[];
+    comment: undefined;
+    comments: undefined;
+  }
   | {
-      userType: 'verified';
-      complaints: IClassroomComplaints[];
-      comment: string;
-      comments: undefined;
-    }
+    userType: 'verified';
+    complaints: IClassroomComplaints[];
+    comment: string;
+    comments: undefined;
+  }
   | {
-      userType: 'admin';
-      complaints: IClassroomComplaints[];
-      comment: undefined;
-      comments: { comment: string; updated_at: string; email: string }[];
-    };
+    userType: 'admin';
+    complaints: IClassroomComplaints[];
+    comment: undefined;
+    comments: { comment: string; updated_at: string; email: string }[];
+  };
 
 const ClassroomProblems: NextPage<IClassroomProblemsProps> = ({
   complaints,
@@ -127,106 +129,115 @@ const ClassroomProblems: NextPage<IClassroomProblemsProps> = ({
   };
 
   return (
-    <div className="w-3/4 mx-auto">
-      <ToastContainer />
-      <h1 className="text-3xl md:text-5xl xl:text-6xl font-bold text-gray-700 text-center pt-2">
-        Edificio <span className="text-emerald-500">{id}</span>
-      </h1>
+    <>
+      <Head>
+        <title>{id}</title>
+      </Head>
 
-      <div className="bg-white flex justify-center">
+      <AppNavbar></AppNavbar>
+
+      <div className="w-3/4 mx-auto">
+        <ToastContainer />
+
+        <h1 className="text-3xl md:text-5xl xl:text-6xl font-bold text-gray-700 text-center pt-2">
+          Edificio <span className="text-emerald-500">{id}</span>
+        </h1>
+
+        <div className="bg-white flex justify-center">
+          {
+            {
+              unverified: null,
+              guest: null,
+              verified: (
+                <div className="flex-auto flex flex-col pt-8 px-6 mx-auto w-1/2">
+                  <label
+                    htmlFor="comment"
+                    className="font-medium text-xl text-gray-700 pb-4 text-center"
+                  >
+                    Comentario
+                  </label>
+
+                  <textarea
+                    name="comment"
+                    value={commentState ?? ''}
+                    onChange={(e) => setCommentState(e.target.value)}
+                    rows={5}
+                    className="block resize-none w-full h-full px-4 py-2 text-slate-700 placeholder-slate-400 bg-white border border-slate-200 rounded-md focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40"
+                  />
+                </div>
+              ),
+              admin: (
+                <div className="flex-auto flex flex-col pt-8 px-6 mx-auto w-1/2">
+                  <p className="font-medium text-xl text-gray-700 pb-4 text-center">
+                    Comentarios
+                  </p>
+                  {comments?.map((v, i) => (
+                    <div key={i} className="bg-slate-50 rounded-md p-2">
+                      <div className="flex justify-between mb-2">
+                        <p className="text-slate-700 font-medium">
+                          {v.email} dice:
+                        </p>
+                        <p className="text-slate-500">{v.updated_at}</p>
+                      </div>
+                      <p className="text-slate-700">{v.comment}</p>
+                    </div>
+                  ))}
+                </div>
+              ),
+            }[userType]
+          }
+
+          <div
+            className={`pt-8 px-6 mx-auto ${userType == 'guest' ? 'w-full' : 'w-1/2'
+              }`}
+          >
+            <p className="font-medium text-xl text-gray-700 pb-4 text-center">
+              Problemas
+            </p>
+            <div className="flex flex-col space-y-2">
+              {complaints.map(({ id, label, count, checked }, i) => {
+                return (
+                  <ClassroomProblem
+                    key={id}
+                    label={label}
+                    count={parseInt(count)}
+                    checked={stateArray[i]}
+                    setChecked={(v) => {
+                      const newStateArray = [...stateArray];
+                      newStateArray[i] = v;
+                      setStateArray(newStateArray);
+                    }}
+                    disabled={userType != 'verified'}
+                  />
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
         {
           {
             unverified: null,
             guest: null,
             verified: (
-              <div className="flex-auto flex flex-col pt-8 px-6 mx-auto w-1/2">
-                <label
-                  htmlFor="comment"
-                  className="font-medium text-xl text-gray-700 pb-4 text-center"
-                >
-                  Comentario
-                </label>
-
-                <textarea
-                  name="comment"
-                  value={commentState ?? ''}
-                  onChange={(e) => setCommentState(e.target.value)}
-                  rows={5}
-                  className="block resize-none w-full h-full px-4 py-2 text-slate-700 placeholder-slate-400 bg-white border border-slate-200 rounded-md focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40"
-                />
+              <div className="mt-4 pt-8 px-6 mx-auto">
+                <AppButton color="emerald" disabled={submitting} onclick={save}>
+                  Guardar
+                </AppButton>
               </div>
             ),
             admin: (
-              <div className="flex-auto flex flex-col pt-8 px-6 mx-auto w-1/2">
-                <p className="font-medium text-xl text-gray-700 pb-4 text-center">
-                  Comentarios
-                </p>
-                {comments?.map((v, i) => (
-                  <div key={i} className="bg-slate-50 rounded-md p-2">
-                    <div className="flex justify-between mb-2">
-                      <p className="text-slate-700 font-medium">
-                        {v.email} dice:
-                      </p>
-                      <p className="text-slate-500">{v.updated_at}</p>
-                    </div>
-                    <p className="text-slate-700">{v.comment}</p>
-                  </div>
-                ))}
+              <div className="mt-4 pt-8 px-6 mx-auto">
+                <AppButton color="amber" disabled={submitting} onclick={reset}>
+                  Reiniciar salón
+                </AppButton>
               </div>
             ),
           }[userType]
         }
-
-        <div
-          className={`pt-8 px-6 mx-auto ${
-            userType == 'guest' ? 'w-full' : 'w-1/2'
-          }`}
-        >
-          <p className="font-medium text-xl text-gray-700 pb-4 text-center">
-            Problemas
-          </p>
-          <div className="flex flex-col space-y-2">
-            {complaints.map(({ id, label, count, checked }, i) => {
-              return (
-                <ClassroomProblem
-                  key={id}
-                  label={label}
-                  count={parseInt(count)}
-                  checked={stateArray[i]}
-                  setChecked={(v) => {
-                    const newStateArray = [...stateArray];
-                    newStateArray[i] = v;
-                    setStateArray(newStateArray);
-                  }}
-                  disabled={userType != 'verified'}
-                />
-              );
-            })}
-          </div>
-        </div>
       </div>
+    </>
 
-      {
-        {
-          unverified: null,
-          guest: null,
-          verified: (
-            <div className="mt-4 pt-8 px-6 mx-auto">
-              <AppButton color="emerald" disabled={submitting} onclick={save}>
-                Guardar
-              </AppButton>
-            </div>
-          ),
-          admin: (
-            <div className="mt-4 pt-8 px-6 mx-auto">
-              <AppButton color="amber" disabled={submitting} onclick={reset}>
-                Reiniciar salón
-              </AppButton>
-            </div>
-          ),
-        }[userType]
-      }
-    </div>
   );
 };
 

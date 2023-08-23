@@ -6,6 +6,8 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Descendant } from 'slate';
 import AdminNotice from '../../components/notice/AdminNotice';
+import AppNavbar from '../../components/AppNavbar';
+import Head from 'next/head';
 
 export interface INotice {
   id: number;
@@ -101,30 +103,40 @@ const AdminPage: NextPage<{ notices: INotice[] }> = (props) => {
   };
 
   return (
-    <div className="bg-white px-0 md:px-8 lg:px-16 h-fit my-8 p-4 ">
-      <ToastContainer />
+    <>
+      <Head>
+        <title>Administración</title>
+      </Head>
 
-      <div className="space-y-4">
-        {notices.map((notice) => {
-          return (
-            <div className="p-3 rounded border shadow" key={notice.id}>
-              <AdminNotice
-                onDelete={deleteNotice}
-                onSetPrivate={setPrivate}
-                onSetPublic={setPublic}
-                notice={notice}
-              />
-            </div>
-          );
-        })}
-      </div>
+      <AppNavbar></AppNavbar>
 
-      <div className="pt-2">
-        <AppButton color="emerald" type="submit" onclick={createNewNotice}>
-          Nuevo anuncio
-        </AppButton>
+      <div className="bg-white px-0 md:px-8 lg:px-16 h-fit my-8 p-4 ">
+
+        <ToastContainer />
+
+        <div className="space-y-4">
+          {notices.map((notice) => {
+            return (
+              <div className="p-3 rounded border shadow" key={notice.id}>
+                <AdminNotice
+                  onDelete={deleteNotice}
+                  onSetPrivate={setPrivate}
+                  onSetPublic={setPublic}
+                  notice={notice}
+                />
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="pt-2">
+          <AppButton color="emerald" type="submit" onclick={createNewNotice}>
+            Nuevo anuncio
+          </AppButton>
+        </div>
       </div>
-    </div>
+    </>
+
   );
 };
 

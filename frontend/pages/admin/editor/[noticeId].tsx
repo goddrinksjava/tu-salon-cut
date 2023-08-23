@@ -32,6 +32,8 @@ import { withLayout } from '../../../plugin/Layout';
 import 'react-toastify/dist/ReactToastify.css';
 import { NoticeElement } from '../../../components/notice/NoticeElement';
 import { NoticeLeaf } from '../../../components/notice/NoticeLeaf';
+import AppNavbar from '../../../components/AppNavbar';
+import Head from 'next/head';
 
 const EditorPage: NextPage<{
   noticeId: number;
@@ -44,13 +46,19 @@ const EditorPage: NextPage<{
       withCorrectVoidBehavior(
         withLayout(withImages(withHistory(withReact(createEditor())))),
       ),
-    [withImages],
+    [],
   );
 
   const initialValue: Descendant[] = editorDocument || defaultValue;
 
   return (
     <>
+      <Head>
+        <title>Editar anuncio</title>
+      </Head>
+
+      <AppNavbar></AppNavbar>
+
       <div className="absolute flex justify-center min-w-full min-h-full bg-gray-100">
         <ToastContainer />
 

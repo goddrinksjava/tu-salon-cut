@@ -8,29 +8,26 @@ export async function seed(knex: Knex): Promise<void> {
   // Inserts seed entries
   await knex('users').insert([
     {
-      id: 1,
       email: 'admin@alumno.udg.mx',
       hashed_password: await argon2.hash('adminPassword', {
         type: argon2.argon2id,
       }),
-      email_validated_at: knex.fn.now(),
+      email_validated_at: knex.fn.now() as any,
       is_admin: true,
     },
     {
-      id: 2,
       email: 'user@alumno.udg.mx',
       hashed_password: await argon2.hash('userPassword', {
         type: argon2.argon2id,
       }),
-      email_validated_at: knex.fn.now(),
+      email_validated_at: knex.fn.now() as any,
     },
     {
-      id: 3,
       email: 'user2@alumno.udg.mx',
       hashed_password: await argon2.hash('user2Password', {
         type: argon2.argon2id,
       }),
-      email_validated_at: knex.fn.now(),
+      email_validated_at: knex.fn.now() as any,
     },
   ]);
 }

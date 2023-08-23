@@ -3,10 +3,11 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 import ClassroomPicker from '../components/ClassroomPicker';
-import Navbar from '../components/Navbar';
 import SearchBar from '../components/SearchBar';
 import buildings from '../json/buildings.json';
 import { UserType } from '../types/userTypes';
+import AppNavbar from '../components/AppNavbar';
+import Head from 'next/head';
 
 const Home: NextPage<{ classrooms: string[]; userType: UserType }> = ({
   classrooms,
@@ -17,15 +18,12 @@ const Home: NextPage<{ classrooms: string[]; userType: UserType }> = ({
 
   return (
     <div className="absolute overflow-y-scroll">
-      {/* <Navbar /> */}
-      <div className="p-2 flex">
-        <SearchBar list={classrooms} />
-        <div className="shrink-0 flex justify-start items-center px-4">
-          <Link href="login">
-            <a className="hover:underline">Iniciar sesión</a>
-          </Link>
-        </div>
-      </div>
+      <Head>
+        <title>Inicio</title>
+      </Head>
+
+      <AppNavbar></AppNavbar>
+
       <div className="relative w-full h-fit">
         <img src="/map.jpg" alt="mapa" />
         {buildings.map((b) => (
